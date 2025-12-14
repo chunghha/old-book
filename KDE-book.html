@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+    :root {
+        --kde-bg: #efefef; /* Standard Qt/KDE background */
+        --kde-light: #ffffff;
+        --kde-dark: #b0b0b0;
+        --kde-border: #808080;
+        --kde-highlight: #6e8bde; /* KDE default highlight blue */
+        --kde-select-text: #ffffff;
+        --kde-text: #222222;
+        --plastic-gradient-top: #fbfbfb;
+        --plastic-gradient-bottom: #dcdcdc;
+        --win-title-top: #8cbaff;
+        --win-title-bottom: #5784e0;
+    }
+
+    body {
+        background: #486a88; /* The classic "KDE Default" desktop color */
+        font-family: "Verdana", "Bitstream Vera Sans", sans-serif;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        user-select: none;
+    }
+
+    /* --- Window Frame (KWin Plastic) --- */
+    .kwin-window {
+        width: 1100px;
+        height: 800px;
+        background-color: var(--kde-bg);
+        border: 1px solid #333;
+        border-radius: 6px 6px 0 0;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .title-bar {
+        height: 26px;
+        background: linear-gradient(to bottom, var(--win-title-top), var(--win-title-bottom));
+        border-bottom: 1px solid #3c5d9c;
+        border-radius: 5px 5px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 6px;
+        color: white;
+        text-shadow: 0 1px 0 rgba(0,0,0,0.3);
+    }
+
+    .window-icon {
+        width: 16px;
+        height: 16px;
+        background: #fff; /* Placeholder for app icon */
+        border-radius: 2px;
+        margin-right: 8px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+
+    .window-title {
+        font-weight: bold;
+        font-size: 12px;
+        flex: 1;
+        text-align: left; /* KDE3 default aligned left */
+    }
+
+    .window-controls {
+        display: flex;
+        gap: 2px;
+    }
+
+    /* Plastic Window Buttons */
+    .win-btn {
+        width: 18px;
+        height: 18px;
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.4);
+        border-radius: 3px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: bold;
+        cursor: pointer;
+        color: white;
+    }
+    
+    .win-btn:hover { background: rgba(255,255,255,0.4); }
+
+    /* --- App Layout --- */
+    .app-container {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        position: relative;
+    }
+
+    /* Menu Bar */
+    .menubar {
+        display: flex;
+        background: var(--kde-bg);
+        padding: 4px 6px;
+        border-bottom: 1px solid #d4d4d4;
+        font-size: 12px;
+    }
+
+    .menu-item {
+        padding: 2px 8px;
+        cursor: default;
+    }
+    .menu-item:hover {
+        background-color: #dcecf9;
+        border: 1px solid #8baadd;
+        border-radius: 2px;
+        padding: 1px 7px; /* Adjust for border */
+    }
+
+    /* Toolbar */
+    .toolbar {
+        background: linear-gradient(to bottom, #fcfcfc 0%, #eeeeee 100%);
+        border-bottom: 1px solid #aaaaaa;
+        padding: 4px 8px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    /* KDE Plastic Button Style */
+    .k-btn {
+        background: linear-gradient(to bottom, var(--plastic-gradient-top) 0%, var(--plastic-gradient-bottom) 100%);
+        border: 1px solid #999;
+        border-radius: 3px;
+        padding: 3px 10px;
+        font-size: 11px;
+        color: #000;
+        cursor: pointer;
+        outline: none;
+        box-shadow: inset 0 1px 0 #fff;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .k-btn:hover {
+        background: linear-gradient(to bottom, #fff 0%, #e6e6e6 100%);
+        border-color: #888;
+    }
+
+    .k-btn:active {
+        background: #dcdcdc;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+    }
+
+    .app-body {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    /* --- Sidebar (KTreeWidget) --- */
+    .sidebar {
+        width: 220px;
+        background: #fcfcfc;
+        border-right: 1px solid #999;
+        display: flex;
+        flex-direction: column;
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .search-wrap {
+        margin-bottom: 10px;
+        position: relative;
+    }
+    
+    .k-input {
+        width: 100%;
+        padding: 3px;
+        border: 1px solid #abadb3;
+        border-top-color: #8e8f94;
+        border-radius: 2px;
+        font-family: inherit;
+        font-size: 11px;
+        box-sizing: border-box;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .nav-header {
+        font-weight: bold;
+        color: #555;
+        margin-top: 10px;
+        margin-bottom: 4px;
+        padding-left: 4px;
+        font-size: 11px;
+    }
+
+    .nav-item {
+        padding: 3px 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid transparent;
+        border-radius: 2px;
+        color: #222;
+    }
+
+    .nav-item:hover {
+        text-decoration: underline;
+    }
+
+    .nav-item.active {
+        background-color: var(--kde-highlight);
+        color: var(--kde-select-text);
+        border-color: #4f6db5;
+    }
+
+    /* --- Main View --- */
+    .main-view {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: var(--kde-bg);
+        padding: 10px;
+        overflow-y: auto;
+    }
+
+    .breadcrumb {
+        font-size: 10px;
+        color: #666;
+        margin-bottom: 5px;
+    }
+
+    .page-title h1 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: normal;
+        /* Typical KDE3 text shadow for headings */
+        text-shadow: 1px 1px 0 #fff;
+    }
+    .page-title p {
+        margin: 2px 0 15px 0;
+        font-size: 11px;
+        color: #555;
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 15px;
+        align-items: center;
+        background: #e6e6e6;
+        border: 1px solid #ccc;
+        padding: 6px;
+        border-radius: 4px;
+    }
+
+    /* --- Charts and Panels --- */
+    .panel-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        height: 260px;
+    }
+
+    .k-panel {
+        background: #fbfbfb;
+        border: 1px solid #a0a0a0;
+        border-radius: 3px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+
+    .chart-container {
+        flex: 1;
+        position: relative;
+        background: white;
+        border: 1px solid #dcdcdc;
+        padding: 5px;
+    }
+
+    /* --- Table (KListView) --- */
+    .table-container {
+        flex: 1;
+        background: white;
+        border: 1px solid #999;
+        overflow: auto;
+        position: relative;
+    }
+
+    .k-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+    }
+
+    .k-table th {
+        /* The classic KDE List Header Gradient */
+        background: linear-gradient(to bottom, #fff 0%, #eee 50%, #ddd 100%);
+        border-right: 1px solid #aaa;
+        border-bottom: 1px solid #999;
+        padding: 4px 6px;
+        text-align: left;
+        font-weight: normal;
+        color: #333;
+        position: sticky;
+        top: 0;
+    }
+    
+    .k-table th:hover {
+        background: linear-gradient(to bottom, #fcfcfc 0%, #e0e0e0 100%);
+    }
+
+    .k-table td {
+        padding: 4px 6px;
+        border-bottom: 1px solid #eee;
+        color: #000;
+    }
+
+    /* Zebra striping common in KDE */
+    .k-table tr:nth-child(even) {
+        background-color: #f7f7f7;
+    }
+
+    /* Row Selection */
+    .k-table tr:hover {
+        background-color: #eef4ff;
+    }
+
+    .status-pill {
+        display: inline-block;
+        padding: 1px 6px;
+        border-radius: 8px;
+        font-size: 9px;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+    .st-done { background: #dff0d8; color: #3c763d; }
+    .st-pend { background: #fcf8e3; color: #8a6d3b; }
+
+    /* Custom Scrollbar (Plastic Style) */
+    ::-webkit-scrollbar {
+        width: 14px;
+        height: 14px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #eee;
+        border-left: 1px solid #ccc;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(to right, #f0f0f0, #d0d0d0);
+        border: 1px solid #999;
+        border-radius: 6px;
+        box-shadow: inset 1px 1px 0 #fff;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #c0c0c0;
+    }
+
+    /* SVG Chart Styles */
+    svg { overflow: visible; }
+    .grid-line { stroke: #e5e5e5; stroke-dasharray: 4; }
+    .chart-line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.2)); }
+    
+    .tooltip-box {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        background: #ffffe1;
+        border: 1px solid #000;
+        padding: 2px 4px;
+        font-size: 10px;
+        box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+    }
+
+    /* Icons simulated with unicode/css shapes */
+    .icon-folder::before { content: "📂"; margin-right:5px; }
+    .icon-file::before { content: "📄"; margin-right:5px; }
+
+</style>
+</head>
+<body>
+
+    <div class="kwin-window">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <div style="display:flex; align-items:center; flex:1;">
+                <div class="window-icon"></div>
+                <div class="window-title">Acme Inc - Financial Dashboard</div>
+            </div>
+            <div class="window-controls">
+                <div class="win-btn">?</div>
+                <div class="win-btn">_</div>
+                <div class="win-btn">[]</div>
+                <div class="win-btn" style="background:#d45555; border-color:#800;">X</div>
+            </div>
+        </div>
+
+        <div class="app-container">
+            <!-- Menu Bar -->
+            <div class="menubar">
+                <div class="menu-item">File</div>
+                <div class="menu-item">Edit</div>
+                <div class="menu-item">View</div>
+                <div class="menu-item">Go</div>
+                <div class="menu-item">Bookmarks</div>
+                <div class="menu-item">Tools</div>
+                <div class="menu-item">Settings</div>
+                <div class="menu-item">Help</div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <button class="k-btn">
+                    <span>⬅</span> Back
+                </button>
+                <button class="k-btn">
+                    <span>➡</span> Forward
+                </button>
+                <div style="width:1px; height:18px; background:#aaa; margin:0 5px;"></div>
+                <button class="k-btn">
+                    <span>🔄</span> Refresh
+                </button>
+                <button class="k-btn">
+                    <span>🏠</span> Home
+                </button>
+                <div style="flex:1;"></div>
+                <div style="position:relative; width: 200px;">
+                    <input class="k-input" placeholder="Search..." style="padding-right:20px;">
+                    <span style="position:absolute; right:4px; top:4px; font-size:10px; color:#999;">🔍</span>
+                </div>
+            </div>
+
+            <div class="app-body">
+                
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <div class="nav-header">MAIN</div>
+                    <div class="nav-item"><span class="icon-folder"></span> Dashboard</div>
+                    <div class="nav-item active"><span class="icon-file"></span> Transaction</div>
+                    <div class="nav-item"><span class="icon-file"></span> Cash Flow</div>
+                    <div class="nav-item"><span class="icon-file"></span> Analytics</div>
+
+                    <div class="nav-header">MONEY</div>
+                    <div class="nav-item"><span class="icon-folder"></span> Operating Acct</div>
+                    <div class="nav-item"><span class="icon-folder"></span> Payroll Acct</div>
+                    <div class="nav-item"><span class="icon-folder"></span> Savings</div>
+                    
+                    <div class="nav-header">WORKFLOWS</div>
+                    <div class="nav-item"><span class="icon-file"></span> Bill Pay</div>
+                    <div class="nav-item"><span class="icon-file"></span> Approvals</div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="main-view">
+                    
+                    <div class="breadcrumb">Home > Transaction</div>
+                    
+                    <div class="page-title">
+                        <h1>Transaction</h1>
+                        <p>Monitor cash flow and net change across your accounts</p>
+                    </div>
+
+                    <!-- Filter Area -->
+                    <div class="filter-bar">
+                        <button class="k-btn">Data View ▾</button>
+                        <button class="k-btn">Filter</button>
+                        <div style="width:1px; height:16px; background:#aaa;"></div>
+                        <button class="k-btn">Date ▾</button>
+                        <button class="k-btn">Keywords ▾</button>
+                        <button class="k-btn">Amount ▾</button>
+                        <div style="flex:1;"></div>
+                        <button class="k-btn" style="font-weight:bold;">Find</button>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="panel-row">
+                        <!-- Chart -->
+                        <div class="k-panel" style="flex: 2;">
+                            <div class="panel-header">
+                                <div>
+                                    <div style="font-size:10px; color:#666;">Net change this period</div>
+                                    <div style="font-size:24px; font-weight:normal; color:#333;">$230.00</div>
+                                </div>
+                                <div style="display:flex; gap:0;">
+                                    <button class="k-btn" style="border-radius:3px 0 0 3px;">Daily</button>
+                                    <button class="k-btn" style="border-radius:0; border-left:none;">Weekly</button>
+                                    <button class="k-btn" style="border-radius:0 3px 3px 0; border-left:none;">Monthly</button>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-container">
+                                <div class="tooltip-box">
+                                    Nov 6<br>
+                                    <span style="color:#d9534f;">●</span> In: 10.8k <br>
+                                    <span style="color:#5bc0de;">●</span> Out: 8.2k
+                                </div>
+                                <svg width="100%" height="100%" viewBox="0 0 300 120" preserveAspectRatio="none">
+                                    <line x1="0" y1="30" x2="300" y2="30" class="grid-line" />
+                                    <line x1="0" y1="60" x2="300" y2="60" class="grid-line" />
+                                    <line x1="0" y1="90" x2="300" y2="90" class="grid-line" />
+                                    
+                                    <!-- Smooth Chart Lines (KDE3 era allowed antialiasing) -->
+                                    <polyline points="0,40 60,40 120,40 160,50 220,70 300,75" class="chart-line" stroke="#d9534f" />
+                                    <polyline points="0,90 60,90 120,90 150,60 200,20 300,20" class="chart-line" stroke="#5bc0de" />
+                                    
+                                    <circle cx="200" cy="20" r="4" fill="#5bc0de" stroke="#fff" stroke-width="1"/>
+                                </svg>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:10px; color:#777; margin-top:5px;">
+                                <span>Nov 1</span><span>Nov 3</span><span>Nov 6</span><span>Nov 9</span>
+                            </div>
+                        </div>
+
+                        <!-- Categories -->
+                        <div class="k-panel" style="flex: 1;">
+                            <div style="font-weight:bold; font-size:12px; margin-bottom:10px;">Top Categories</div>
+                            
+                            <div style="background:#eee; height:16px; border-radius:3px; overflow:hidden; display:flex; margin-bottom:15px; border:1px solid #ccc;">
+                                <div style="width:30%; background:#5bc0de;"></div>
+                                <div style="width:20%; background:#5e8dff;"></div>
+                                <div style="width:20%; background:#f0ad4e;"></div>
+                                <div style="width:30%; background:#d9534f;"></div>
+                            </div>
+
+                            <ul style="list-style:none; padding:0; font-size:11px;">
+                                <li style="margin-bottom:6px; display:flex; align-items:center;"><div style="width:8px; height:8px; background:#5bc0de; border-radius:2px; margin-right:6px;"></div> Google Workspace</li>
+                                <li style="margin-bottom:6px; display:flex; align-items:center;"><div style="width:8px; height:8px; background:#5e8dff; border-radius:2px; margin-right:6px;"></div> Mobbin</li>
+                                <li style="margin-bottom:6px; display:flex; align-items:center;"><div style="width:8px; height:8px; background:#f0ad4e; border-radius:2px; margin-right:6px;"></div> Wise Use INC</li>
+                                <li style="margin-bottom:6px; display:flex; align-items:center;"><div style="width:8px; height:8px; background:#d9534f; border-radius:2px; margin-right:6px;"></div> AWS</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="table-container">
+                        <table class="k-table">
+                            <thead>
+                                <tr>
+                                    <th width="20"><input type="checkbox"></th>
+                                    <th>Date</th>
+                                    <th>To / From</th>
+                                    <th>Account</th>
+                                    <th>Category</th>
+                                    <th>Method</th>
+                                    <th>Receipt</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Nov 2</td>
+                                    <td>Google Workspace</td>
+                                    <td>Brex ... 2502</td>
+                                    <td>Software</td>
+                                    <td>Card</td>
+                                    <td>Missing</td>
+                                    <td style="color:green;">+ $10.60</td>
+                                    <td><span class="status-pill st-done">Done</span></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Nov 8</td>
+                                    <td>Wise Use INC</td>
+                                    <td>Chase ... 2502</td>
+                                    <td>Transfer</td>
+                                    <td>Incoming</td>
+                                    <td>Attached</td>
+                                    <td style="color:red;">- $10.60</td>
+                                    <td><span class="status-pill st-done">Done</span></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Dec 4</td>
+                                    <td>Mobbin</td>
+                                    <td>Brex ... 2502</td>
+                                    <td>Service</td>
+                                    <td>Wire</td>
+                                    <td>Missing</td>
+                                    <td style="color:red;">- $10.60</td>
+                                    <td><span class="status-pill st-pend">Pending</span></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Dec 9</td>
+                                    <td>Internal Transfer</td>
+                                    <td>Chase ... 2502</td>
+                                    <td>Cloud</td>
+                                    <td>Transfer</td>
+                                    <td>N/A</td>
+                                    <td style="color:red;">- $10.60</td>
+                                    <td><span class="status-pill st-done">Done</span></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Jan 2</td>
+                                    <td>Amazon Web</td>
+                                    <td>Brex ... 2502</td>
+                                    <td>Revenue</td>
+                                    <td>ACH</td>
+                                    <td>Attached</td>
+                                    <td style="color:red;">- $10.60</td>
+                                    <td><span class="status-pill st-pend">Pending</span></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Jan 4</td>
+                                    <td>Stripe Payout</td>
+                                    <td>Chase ... 2502</td>
+                                    <td>Service</td>
+                                    <td>Transfer</td>
+                                    <td>Missing</td>
+                                    <td style="color:green;">+ $10.60</td>
+                                    <td><span class="status-pill st-pend">Pending</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+            
+            <!-- Status Bar -->
+            <div style="height:20px; background:#efefef; border-top:1px solid #aaa; display:flex; align-items:center; padding:0 8px; font-size:10px; color:#555;">
+                Ready. 6 items loaded.
+                <div style="flex:1;"></div>
+                <div style="width:10px; height:10px; border-right:2px solid #999; border-bottom:2px solid #999;"></div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

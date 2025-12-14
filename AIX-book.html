@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+    :root {
+        --motif-bg: #AEB2C3;
+        --motif-light: #E0E0E0;
+        --motif-highlight: #FFFFFF;
+        --motif-shadow: #696969;
+        --motif-dark-shadow: #000000;
+        --motif-active-title: #4b6e8a; /* AIX Slate Blue */
+        --motif-text: #000000;
+        --motif-input-bg: #D9D9D9; /* Slightly darker for sunken inputs */
+    }
+
+    body {
+        background-color: #2F4F4F; /* Dark Slate Gray Desktop (Classic Unix) */
+        font-family: Helvetica, Arial, sans-serif;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        user-select: none;
+    }
+
+    /* --- MWM (Motif Window Manager) Frame --- */
+    .mwm-window {
+        width: 1150px;
+        height: 820px;
+        background-color: var(--motif-bg);
+        border: 7px solid var(--motif-bg); /* The thick resizing frame */
+        box-shadow: 
+            -1px -1px 0 0 var(--motif-highlight),
+            1px 1px 0 0 var(--motif-dark-shadow),
+            10px 10px 0px rgba(0,0,0,0.5); /* Drop shadow on desktop */
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    /* Outer beveled frame for the window content */
+    .mwm-outer-frame {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border-top: 1px solid var(--motif-highlight);
+        border-left: 1px solid var(--motif-highlight);
+        border-right: 1px solid var(--motif-dark-shadow);
+        border-bottom: 1px solid var(--motif-dark-shadow);
+    }
+
+    /* --- Title Bar --- */
+    .title-bar {
+        background-color: var(--motif-active-title);
+        height: 28px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2px;
+        margin-bottom: 2px;
+        border: 1px solid var(--motif-dark-shadow);
+    }
+
+    .title-text {
+        color: white;
+        font-weight: bold;
+        font-size: 13px;
+        letter-spacing: 0.5px;
+        margin-left: 8px;
+    }
+
+    .mwm-btn {
+        width: 24px;
+        height: 24px;
+        background-color: var(--motif-bg);
+        border-top: 2px solid var(--motif-highlight);
+        border-left: 2px solid var(--motif-highlight);
+        border-right: 2px solid var(--motif-dark-shadow);
+        border-bottom: 2px solid var(--motif-dark-shadow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .mwm-btn:active {
+        border-top: 2px solid var(--motif-dark-shadow);
+        border-left: 2px solid var(--motif-dark-shadow);
+        border-right: 2px solid var(--motif-highlight);
+        border-bottom: 2px solid var(--motif-highlight);
+    }
+
+    .icon-min { width: 6px; height: 6px; border: 1px solid black; background: black; }
+    .icon-max { width: 14px; height: 14px; border: 1px solid black; }
+    .icon-menu { width: 10px; height: 2px; background: black; box-shadow: 0 0 0 1px white inset; }
+
+    /* --- Menu Bar --- */
+    .menu-bar {
+        display: flex;
+        padding: 2px 4px;
+        background-color: var(--motif-bg);
+        border-bottom: 2px solid var(--motif-shadow);
+        margin-bottom: 6px;
+    }
+
+    .menu-item {
+        padding: 4px 10px;
+        font-size: 12px;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+    .menu-item:hover {
+        border-top: 1px solid var(--motif-highlight);
+        border-left: 1px solid var(--motif-highlight);
+        border-right: 1px solid var(--motif-dark-shadow);
+        border-bottom: 1px solid var(--motif-dark-shadow);
+    }
+    .menu-item span { text-decoration: underline; }
+
+    /* --- Layout --- */
+    .app-body {
+        display: flex;
+        flex: 1;
+        padding: 6px;
+        gap: 8px;
+        background: var(--motif-bg);
+        overflow: hidden;
+    }
+
+    /* --- Sidebar --- */
+    .sidebar {
+        width: 200px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .x-input-wrapper {
+        border-top: 2px solid var(--motif-dark-shadow);
+        border-left: 2px solid var(--motif-dark-shadow);
+        border-right: 2px solid var(--motif-highlight);
+        border-bottom: 2px solid var(--motif-highlight);
+        background: var(--motif-input-bg);
+        padding: 2px;
+    }
+
+    .x-input {
+        width: 100%;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 12px;
+    }
+
+    .motif-list {
+        flex: 1;
+        border-top: 2px solid var(--motif-dark-shadow);
+        border-left: 2px solid var(--motif-dark-shadow);
+        border-right: 2px solid var(--motif-highlight);
+        border-bottom: 2px solid var(--motif-highlight);
+        background: #C0C4D0;
+        padding: 4px;
+        overflow-y: auto;
+    }
+
+    .list-header {
+        font-weight: bold;
+        font-size: 11px;
+        margin-bottom: 4px;
+        margin-top: 8px;
+        text-transform: uppercase;
+        color: #333;
+    }
+
+    .list-item {
+        padding: 2px 4px;
+        font-size: 12px;
+        cursor: pointer;
+        font-family: Helvetica, Arial, sans-serif;
+    }
+
+    .list-item:hover {
+        border: 1px dotted black;
+    }
+
+    .list-item.selected {
+        background-color: #000080; /* Motif selection blue */
+        color: white;
+    }
+
+    /* --- Main Area --- */
+    .main-view {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .top-controls {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        padding-bottom: 8px;
+        border-bottom: 2px groove var(--motif-light);
+    }
+
+    .motif-btn {
+        background: var(--motif-bg);
+        border-top: 2px solid var(--motif-highlight);
+        border-left: 2px solid var(--motif-highlight);
+        border-right: 2px solid var(--motif-dark-shadow);
+        border-bottom: 2px solid var(--motif-dark-shadow);
+        padding: 4px 12px;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .motif-btn:active {
+        border-top: 2px solid var(--motif-dark-shadow);
+        border-left: 2px solid var(--motif-dark-shadow);
+        border-right: 2px solid var(--motif-highlight);
+        border-bottom: 2px solid var(--motif-highlight);
+        padding: 5px 11px 3px 13px; /* Shift text */
+    }
+
+    .header-text h1 {
+        font-size: 18px;
+        margin: 0;
+        font-family: "Times New Roman", Times, serif; /* Typical for documentation/headers in X11 */
+    }
+    .header-text p { margin: 0; font-size: 11px; font-family: "Courier New", monospace; }
+
+    /* --- Dashboard Widgets --- */
+    .widget-container {
+        display: flex;
+        gap: 10px;
+        height: 250px;
+    }
+
+    .panel-frame {
+        border-top: 2px solid var(--motif-highlight);
+        border-left: 2px solid var(--motif-highlight);
+        border-right: 2px solid var(--motif-dark-shadow);
+        border-bottom: 2px solid var(--motif-dark-shadow);
+        padding: 2px;
+        background: var(--motif-bg);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .panel-inner {
+        flex: 1;
+        border: 1px solid var(--motif-shadow); /* Inner etch */
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* X11 Style Chart */
+    .x11-chart {
+        background-color: black;
+        border-top: 2px solid var(--motif-dark-shadow);
+        border-left: 2px solid var(--motif-dark-shadow);
+        border-right: 2px solid var(--motif-highlight);
+        border-bottom: 2px solid var(--motif-highlight);
+        flex: 1;
+        position: relative;
+        font-family: "Courier New", monospace;
+        color: #00FF00;
+        font-size: 10px;
+    }
+    
+    .x11-tooltip {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        background: #FFFFE0;
+        border: 1px solid black;
+        color: black;
+        padding: 2px;
+        font-family: "Fixed", monospace;
+        font-size: 9px;
+        z-index: 10;
+        box-shadow: 2px 2px 0 black;
+    }
+
+    /* --- Table (XmList style) --- */
+    .table-frame {
+        flex: 1;
+        border-top: 2px solid var(--motif-dark-shadow);
+        border-left: 2px solid var(--motif-dark-shadow);
+        border-right: 2px solid var(--motif-highlight);
+        border-bottom: 2px solid var(--motif-highlight);
+        background: #D0D0D0;
+        overflow: auto;
+        font-family: "Courier New", Courier, monospace;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+    }
+
+    thead th {
+        background-color: var(--motif-bg);
+        border-top: 2px solid var(--motif-highlight);
+        border-left: 2px solid var(--motif-highlight);
+        border-right: 2px solid var(--motif-dark-shadow);
+        border-bottom: 2px solid var(--motif-dark-shadow);
+        text-align: left;
+        padding: 4px;
+        font-family: Helvetica, Arial, sans-serif;
+    }
+
+    tbody td {
+        padding: 4px;
+        border: 1px solid #999;
+        background: white;
+    }
+    
+    /* Simulate monospaced text for amounts like a terminal */
+    .mono-amt {
+        font-family: "Courier New", monospace;
+        font-weight: bold;
+    }
+
+    /* Custom Scrollbar to mimic Motif */
+    ::-webkit-scrollbar {
+        width: 18px;
+        height: 18px;
+    }
+    ::-webkit-scrollbar-track {
+        background: var(--motif-bg);
+        box-shadow: inset 1px 1px 0 var(--motif-highlight);
+    }
+    ::-webkit-scrollbar-thumb {
+        background-color: var(--motif-bg);
+        border-top: 2px solid var(--motif-highlight);
+        border-left: 2px solid var(--motif-highlight);
+        border-right: 2px solid var(--motif-dark-shadow);
+        border-bottom: 2px solid var(--motif-dark-shadow);
+    }
+    
+    /* Chart SVG */
+    svg polyline { fill: none; stroke-width: 1; stroke-linejoin: bevel; }
+
+</style>
+</head>
+<body>
+
+    <!-- MWM Window -->
+    <div class="mwm-window">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <!-- Menu Button -->
+            <div class="mwm-btn" style="margin-left: 2px;">
+                <div class="icon-menu"></div>
+            </div>
+            
+            <div class="title-text">acme_inc : transaction_manager</div>
+            
+            <div style="display:flex; gap:2px; margin-right: 2px;">
+                <!-- Minimize -->
+                <div class="mwm-btn">
+                    <div class="icon-min"></div>
+                </div>
+                <!-- Maximize -->
+                <div class="mwm-btn">
+                    <div class="icon-max"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mwm-outer-frame">
+            <!-- Menu Bar -->
+            <div class="menu-bar">
+                <div class="menu-item"><span>F</span>ile</div>
+                <div class="menu-item"><span>E</span>dit</div>
+                <div class="menu-item"><span>V</span>iew</div>
+                <div class="menu-item"><span>O</span>ptions</div>
+                <div class="menu-item"><span>H</span>elp</div>
+            </div>
+
+            <div class="app-body">
+                
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <div class="x-input-wrapper">
+                        <input class="x-input" value="Search..." />
+                    </div>
+
+                    <div class="motif-list">
+                        <div class="list-header">MAIN</div>
+                        <div class="list-item">Dashboard</div>
+                        <div class="list-item selected">Transaction</div>
+                        <div class="list-item">Cash Flow</div>
+                        <div class="list-item">Analytics</div>
+
+                        <div class="list-header">MONEY</div>
+                        <div class="list-item">Operating Acct</div>
+                        <div class="list-item">Payroll Acct</div>
+                        <div class="list-item">Savings</div>
+                        
+                        <div class="list-header">WORKFLOWS</div>
+                        <div class="list-item">Bill Pay</div>
+                        <div class="list-item">Approvals</div>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="main-view">
+                    
+                    <div class="header-text">
+                        <h1>Transaction View</h1>
+                        <p>/home/acme/finance/transactions</p>
+                    </div>
+
+                    <!-- Toolbar -->
+                    <div class="top-controls">
+                        <button class="motif-btn">Data View</button>
+                        <button class="motif-btn">Filter</button>
+                        <button class="motif-btn">Date</button>
+                        <div style="flex:1; border-bottom:1px solid #999; height:50%;"></div>
+                        <button class="motif-btn">Search Query</button>
+                    </div>
+
+                    <!-- Charts / Panels -->
+                    <div class="widget-container">
+                        
+                        <!-- Chart -->
+                        <div class="panel-frame" style="flex:2;">
+                            <div class="panel-inner">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                    <span style="font-weight:bold; font-size:12px;">NET CHANGE: $230.00</span>
+                                    <div style="display:flex; gap:2px;">
+                                        <button class="motif-btn" style="padding:2px 6px; font-size:10px;">D</button>
+                                        <button class="motif-btn" style="padding:2px 6px; font-size:10px;">W</button>
+                                        <button class="motif-btn" style="padding:2px 6px; font-size:10px;">M</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="x11-chart">
+                                    <div class="x11-tooltip">
+                                        NOV 6<br>
+                                        IN:10.8K OUT:8.2K
+                                    </div>
+                                    <svg viewBox="0 0 300 100" preserveAspectRatio="none" width="100%" height="100%">
+                                        <!-- Grid (Green terminal style) -->
+                                        <line x1="0" y1="25" x2="300" y2="25" stroke="#003300" />
+                                        <line x1="0" y1="50" x2="300" y2="50" stroke="#003300" />
+                                        <line x1="0" y1="75" x2="300" y2="75" stroke="#003300" />
+
+                                        <!-- Lines (Raw 1px) -->
+                                        <polyline points="0,40 50,40 100,40 150,20 200,30 250,50 300,50" stroke="#FF0000" />
+                                        <polyline points="0,30 50,30 100,30 130,35 180,45 220,50 300,40" stroke="#00FF00" />
+                                        
+                                        <!-- X Axis Ticks -->
+                                        <line x1="50" y1="95" x2="50" y2="100" stroke="white" />
+                                        <line x1="100" y1="95" x2="100" y2="100" stroke="white" />
+                                        <line x1="150" y1="95" x2="150" y2="100" stroke="white" />
+                                        <line x1="200" y1="95" x2="200" y2="100" stroke="white" />
+                                        <line x1="250" y1="95" x2="250" y2="100" stroke="white" />
+                                    </svg>
+                                    <div style="position:absolute; bottom:2px; left:5px; color:white; font-family:Fixed;">xplot: monitor_01</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Categories -->
+                        <div class="panel-frame" style="flex:1;">
+                            <div class="panel-inner">
+                                <div style="font-weight:bold; font-size:12px; margin-bottom:10px;">TOP_CATEGORIES</div>
+                                <div style="border: 2px solid var(--motif-dark-shadow); height:20px; background:white; display:flex;">
+                                    <div style="width:30%; background:red;"></div>
+                                    <div style="width:20%; background:blue;"></div>
+                                    <div style="width:20%; background:yellow;"></div>
+                                    <div style="width:30%; background:green;"></div>
+                                </div>
+                                <ul style="list-style:none; padding:0; font-size:11px; margin-top:10px;">
+                                    <li style="margin-bottom:4px;">[#] Google Workspace</li>
+                                    <li style="margin-bottom:4px;">[#] Mobbin</li>
+                                    <li style="margin-bottom:4px;">[#] Wise Use INC</li>
+                                    <li style="margin-bottom:4px;">[#] AWS</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Data Grid -->
+                    <div class="table-frame">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="20">[x]</th>
+                                    <th>Date</th>
+                                    <th>To / From</th>
+                                    <th>Account</th>
+                                    <th>Category</th>
+                                    <th>Method</th>
+                                    <th>Receipt</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Nov 02</td>
+                                    <td>Google Workspace</td>
+                                    <td>Brex..2502</td>
+                                    <td>Software</td>
+                                    <td>Card</td>
+                                    <td>MISSING</td>
+                                    <td class="mono-amt">+10.60</td>
+                                    <td>Done</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Nov 08</td>
+                                    <td>Wise Use INC</td>
+                                    <td>Chase..2502</td>
+                                    <td>Transfer</td>
+                                    <td>Inc</td>
+                                    <td>ATTACHED</td>
+                                    <td class="mono-amt">-10.60</td>
+                                    <td>Done</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Dec 04</td>
+                                    <td>Mobbin</td>
+                                    <td>Brex..2502</td>
+                                    <td>Service</td>
+                                    <td>Wire</td>
+                                    <td>MISSING</td>
+                                    <td class="mono-amt">-10.60</td>
+                                    <td>Pending</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Dec 09</td>
+                                    <td>Internal Tx</td>
+                                    <td>Chase..2502</td>
+                                    <td>Cloud</td>
+                                    <td>Txfr</td>
+                                    <td>N/A</td>
+                                    <td class="mono-amt">-10.60</td>
+                                    <td>Done</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Jan 02</td>
+                                    <td>Amazon Web</td>
+                                    <td>Brex..2502</td>
+                                    <td>Revenue</td>
+                                    <td>ACH</td>
+                                    <td>ATTACHED</td>
+                                    <td class="mono-amt">-10.60</td>
+                                    <td>Pending</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Jan 04</td>
+                                    <td>Stripe Payout</td>
+                                    <td>Chase..2502</td>
+                                    <td>Service</td>
+                                    <td>Txfr</td>
+                                    <td>MISSING</td>
+                                    <td class="mono-amt">+10.60</td>
+                                    <td>Pending</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

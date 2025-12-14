@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+    :root {
+        --beos-desktop: #336698;
+        --beos-grey: #d8d8d8;
+        --beos-yellow: #ffcc00;
+        --beos-light: #ffffff;
+        --beos-shadow: #999999;
+        --beos-dark-shadow: #555555;
+        --beos-text: #000000;
+        --beos-select: #c0c0c0; /* Standard grey selection */
+        --beos-blue-select: #b0c4de; /* List selection */
+        --chart-line-1: #db3a3a;
+        --chart-line-2: #2e8b57;
+    }
+
+    body {
+        background-color: var(--beos-desktop);
+        font-family: "DejaVu Sans", "Verdana", sans-serif;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        user-select: none;
+    }
+
+    /* --- BeOS Window Structure --- */
+    .window-container {
+        display: flex;
+        flex-direction: column;
+        width: 1100px;
+        height: 800px;
+        filter: drop-shadow(4px 4px 6px rgba(0,0,0,0.4));
+    }
+
+    .window-tab {
+        background-color: var(--beos-yellow);
+        height: 24px;
+        width: 200px; /* The iconic short tab */
+        border-top: 1px solid #ffe680;
+        border-left: 1px solid #ffe680;
+        border-right: 1px solid #b38f00;
+        border-radius: 4px 4px 0 0;
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+        position: relative;
+        z-index: 2;
+        margin-left: 0; /* Left aligned tab */
+    }
+
+    .window-title {
+        font-size: 11px;
+        font-weight: bold;
+        color: #000;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .window-frame {
+        flex: 1;
+        background-color: var(--beos-grey);
+        border-top: 1px solid var(--beos-light);
+        border-left: 1px solid var(--beos-light);
+        border-right: 1px solid var(--beos-dark-shadow);
+        border-bottom: 1px solid var(--beos-dark-shadow);
+        display: flex;
+        flex-direction: column;
+        padding: 3px;
+        position: relative;
+        /* The yellow border extension on the left often seen in BeOS */
+        box-shadow: -4px 0 0 var(--beos-yellow); 
+        margin-left: 4px; /* To account for the yellow strip */
+    }
+
+    /* Simulate the yellow strip connecting tab to body */
+    .window-tab::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: -4px;
+        width: 4px;
+        height: 24px;
+        background: var(--beos-yellow);
+        border-bottom: 1px solid var(--beos-yellow);
+    }
+
+    /* Close button block inside tab logic was rarely standard, usually standard controls inside window or just a tab. 
+       We'll keep it simple: Title only on tab, closer inside frame if needed, but strict BeOS puts closer in tab. */
+    .tab-close {
+        width: 12px;
+        height: 12px;
+        background: #cc3333;
+        margin-right: 6px;
+        border: 1px solid #550000;
+        box-shadow: inset 1px 1px #ff6666;
+    }
+
+    /* --- Layout --- */
+    .app-layout {
+        display: flex;
+        height: 100%;
+        gap: 4px;
+    }
+
+    /* --- Sidebar (BListView) --- */
+    .sidebar {
+        width: 220px;
+        background-color: var(--beos-light);
+        border: 1px solid var(--beos-shadow);
+        border-top-color: var(--beos-dark-shadow); /* Inset look */
+        border-left-color: var(--beos-dark-shadow);
+        border-right-color: var(--beos-light);
+        border-bottom-color: var(--beos-light);
+        padding: 6px;
+        display: flex;
+        flex-direction: column;
+        font-size: 11px;
+    }
+
+    .sidebar-group {
+        margin-bottom: 12px;
+    }
+
+    .sidebar-header {
+        color: #666;
+        font-weight: normal;
+        margin-bottom: 4px;
+        padding-left: 4px;
+        font-size: 10px;
+    }
+
+    .sidebar-item {
+        padding: 3px 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .sidebar-item:hover {
+        background-color: #eee;
+    }
+
+    .sidebar-item.active {
+        background-color: #ddd; /* BeOS selection is subtle grey or blue */
+        color: black;
+        border: 1px dotted #666;
+    }
+
+    .search-wrap {
+        margin-bottom: 10px;
+        border: 1px solid var(--beos-shadow);
+        border-top-color: var(--beos-dark-shadow);
+        border-left-color: var(--beos-dark-shadow);
+        border-bottom-color: var(--beos-light);
+        border-right-color: var(--beos-light);
+        background: #fff;
+        padding: 2px;
+    }
+    
+    .search-input {
+        width: 100%;
+        border: none;
+        outline: none;
+        font-family: inherit;
+        font-size: 11px;
+    }
+
+    /* --- Main View --- */
+    .main-view {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding-left: 4px;
+        overflow: hidden;
+    }
+
+    /* BeOS Menu Bar style container */
+    .menubar-container {
+        margin-bottom: 10px;
+        border-bottom: 1px solid var(--beos-shadow);
+        padding-bottom: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .header-title h1 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: normal;
+        color: #222;
+    }
+    .header-title p {
+        margin: 2px 0 0 0;
+        font-size: 10px;
+        color: #555;
+    }
+
+    /* --- Buttons (BButton) --- */
+    .be-btn {
+        background-color: var(--beos-grey);
+        border-top: 1px solid var(--beos-light);
+        border-left: 1px solid var(--beos-light);
+        border-right: 1px solid var(--beos-dark-shadow);
+        border-bottom: 1px solid var(--beos-dark-shadow);
+        padding: 4px 12px;
+        font-size: 11px;
+        color: #000;
+        cursor: pointer;
+        outline: none;
+        font-family: inherit;
+        text-decoration: none;
+        display: inline-block;
+        margin-right: 4px;
+    }
+
+    .be-btn:active {
+        border-top: 1px solid var(--beos-dark-shadow);
+        border-left: 1px solid var(--beos-dark-shadow);
+        border-right: 1px solid var(--beos-light);
+        border-bottom: 1px solid var(--beos-light);
+        background-color: #ccc;
+        padding-top: 5px; /* Physical press effect */
+        padding-bottom: 3px;
+    }
+
+    /* --- Panels --- */
+    .panel-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+        height: 240px;
+    }
+
+    .be-panel {
+        background: var(--beos-grey);
+        /* Subtle framing often seen in BeOS interfaces */
+        border: 1px solid var(--beos-shadow);
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* --- Chart --- */
+    .chart-box {
+        background: #fff;
+        border: 1px solid var(--beos-shadow);
+        border-top-color: var(--beos-dark-shadow);
+        border-left-color: var(--beos-dark-shadow);
+        border-bottom-color: var(--beos-light);
+        border-right-color: var(--beos-light);
+        flex: 1;
+        position: relative;
+        padding: 10px;
+    }
+
+    .stat-display {
+        font-size: 20px;
+        margin-bottom: 5px;
+    }
+
+    /* --- List/Table (BColumnListView) --- */
+    .list-view-container {
+        flex: 1;
+        background: #fff;
+        border: 1px solid var(--beos-shadow);
+        border-top-color: var(--beos-dark-shadow);
+        border-left-color: var(--beos-dark-shadow);
+        border-bottom-color: var(--beos-light);
+        border-right-color: var(--beos-light);
+        overflow: auto;
+        position: relative;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+    }
+
+    thead th {
+        background: #e0e0e0;
+        border-right: 1px solid #999;
+        border-bottom: 1px solid #999;
+        text-align: left;
+        padding: 4px 6px;
+        font-weight: normal;
+        position: sticky;
+        top: 0;
+    }
+
+    tbody td {
+        padding: 4px 6px;
+        border-bottom: 1px solid #eee;
+        color: #000;
+    }
+
+    /* Row selection style */
+    tbody tr:hover {
+        background-color: #f0f0f0;
+    }
+    
+    .status-badge {
+        padding: 1px 4px;
+        border-radius: 2px;
+        font-size: 9px;
+    }
+    .status-done { background: #e0ffd4; border: 1px solid #80c080; color: #004400; }
+    .status-pending { background: #ffe0d4; border: 1px solid #c08080; color: #440000; }
+
+    /* --- Scrollbar Customization (Webkit) --- */
+    ::-webkit-scrollbar {
+        width: 14px;
+        height: 14px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #e8e8e8;
+        border-left: 1px solid #fff;
+    }
+    ::-webkit-scrollbar-thumb {
+        background-color: var(--beos-grey);
+        border-top: 1px solid var(--beos-light);
+        border-left: 1px solid var(--beos-light);
+        border-right: 1px solid var(--beos-dark-shadow);
+        border-bottom: 1px solid var(--beos-dark-shadow);
+    }
+    /* The famous BeOS scrollbar thumb dimples are hard in pure css, skipping for sanity */
+
+    /* --- SVG Chart --- */
+    svg { overflow: visible; }
+    .grid-line { stroke: #ddd; stroke-dasharray: 2; }
+    .chart-line { fill: none; stroke-width: 2; stroke-linejoin: round; }
+
+    /* Resize Handle */
+    .resize-handle {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        width: 10px;
+        height: 10px;
+        background: linear-gradient(135deg, transparent 50%, #999 50%);
+        cursor: nwse-resize;
+    }
+
+</style>
+</head>
+<body>
+
+    <div class="window-container">
+        <!-- The Yellow Tab -->
+        <div class="window-tab">
+            <div class="tab-close"></div>
+            <div class="window-title">Acme Inc : Transaction</div>
+        </div>
+
+        <!-- Main Window Frame -->
+        <div class="window-frame">
+            <div class="app-layout">
+                
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <div class="search-wrap">
+                        <input type="text" class="search-input" placeholder="Search">
+                    </div>
+
+                    <div class="sidebar-group">
+                        <div class="sidebar-header">MAIN</div>
+                        <div class="sidebar-item">Dashboard</div>
+                        <div class="sidebar-item active">Transaction</div>
+                        <div class="sidebar-item">Cash Flow</div>
+                        <div class="sidebar-item">Analytics</div>
+                    </div>
+
+                    <div class="sidebar-group">
+                        <div class="sidebar-header">MONEY</div>
+                        <div class="sidebar-item">Operating Acct</div>
+                        <div class="sidebar-item">Payroll Acct</div>
+                        <div class="sidebar-item">Savings</div>
+                    </div>
+
+                    <div class="sidebar-group">
+                        <div class="sidebar-header">WORKFLOWS</div>
+                        <div class="sidebar-item">Bill Pay</div>
+                        <div class="sidebar-item">Approvals</div>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="main-view">
+                    
+                    <!-- Header Area -->
+                    <div class="menubar-container">
+                        <div class="header-title">
+                            <h1>Transaction</h1>
+                            <p>Monitor cash flow and net change across your accounts</p>
+                        </div>
+                        <div>
+                            <button class="be-btn">Search</button>
+                        </div>
+                    </div>
+
+                    <!-- Filter Bar -->
+                    <div style="margin-bottom: 10px; display:flex; gap: 4px;">
+                        <button class="be-btn">Data View &#9662;</button>
+                        <button class="be-btn">Filter</button>
+                        <button class="be-btn">Date &#9662;</button>
+                        <button class="be-btn">Keywords &#9662;</button>
+                        <button class="be-btn">Amount &#9662;</button>
+                    </div>
+
+                    <!-- Top Widgets -->
+                    <div class="panel-row">
+                        <!-- Chart Panel -->
+                        <div class="be-panel" style="flex: 2;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                <div>
+                                    <div style="font-size:10px; color:#666;">Net change this period</div>
+                                    <div class="stat-display">$230.00</div>
+                                </div>
+                                <div>
+                                    <button class="be-btn">D</button>
+                                    <button class="be-btn">W</button>
+                                    <button class="be-btn">M</button>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-box">
+                                <svg width="100%" height="100%" viewBox="0 0 300 120" preserveAspectRatio="none">
+                                    <line x1="0" y1="30" x2="300" y2="30" class="grid-line" />
+                                    <line x1="0" y1="60" x2="300" y2="60" class="grid-line" />
+                                    <line x1="0" y1="90" x2="300" y2="90" class="grid-line" />
+                                    
+                                    <!-- Green Line -->
+                                    <polyline points="0,40 60,40 120,40 160,50 220,70 300,75" class="chart-line" stroke="#2e8b57" />
+                                    <!-- Red Line -->
+                                    <polyline points="0,90 60,90 120,90 150,60 200,20 300,20" class="chart-line" stroke="#db3a3a" />
+                                    
+                                    <!-- Data Point Hover -->
+                                    <circle cx="200" cy="20" r="3" fill="#db3a3a" />
+                                    <text x="210" y="20" font-size="9" fill="#333">Nov 6</text>
+                                </svg>
+                            </div>
+                            <div style="font-size:9px; color:#555; display:flex; justify-content:space-between; margin-top:2px;">
+                                <span>NOV 1</span><span>NOV 3</span><span>NOV 6</span><span>NOV 9</span>
+                            </div>
+                        </div>
+
+                        <!-- Categories Panel -->
+                        <div class="be-panel" style="flex: 1;">
+                            <div style="font-weight:bold; font-size:11px; margin-bottom:4px;">Top Categories</div>
+                            
+                            <!-- Simple Stacked Bar -->
+                            <div style="display:flex; height:12px; width:100%; border:1px solid #888; margin-bottom:10px;">
+                                <div style="width:30%; background:#4ecdc4;"></div>
+                                <div style="width:20%; background:#45b7d1;"></div>
+                                <div style="width:20%; background:#ffda79;"></div>
+                                <div style="width:30%; background:#ccc;"></div>
+                            </div>
+
+                            <div style="display:flex; flex-direction:column; gap:6px; font-size:10px;">
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                    <div style="width:8px; height:8px; background:#4ecdc4; border:1px solid #555;"></div> Google
+                                </div>
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                    <div style="width:8px; height:8px; background:#45b7d1; border:1px solid #555;"></div> Mobbin
+                                </div>
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                    <div style="width:8px; height:8px; background:#ffda79; border:1px solid #555;"></div> Wise Use
+                                </div>
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                    <div style="width:8px; height:8px; background:#ccc; border:1px solid #555;"></div> Other
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transaction List -->
+                    <div class="list-view-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="20"></th>
+                                    <th>Date</th>
+                                    <th>To / From</th>
+                                    <th>Account</th>
+                                    <th>Category</th>
+                                    <th>Methods</th>
+                                    <th>Receipt</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Nov 2</td>
+                                    <td>Google Workspace</td>
+                                    <td>Brex ... 2502</td>
+                                    <td>Software</td>
+                                    <td>Card</td>
+                                    <td>Missing</td>
+                                    <td>$10.60</td>
+                                    <td><span class="status-badge status-done">Done</span></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Nov 8</td>
+                                    <td>Wise Use INC</td>
+                                    <td>Chase ... 2502</td>
+                                    <td>Transfer</td>
+                                    <td>Incoming</td>
+                                    <td>Attached</td>
+                                    <td>$10.60</td>
+                                    <td><span class="status-badge status-done">Done</span></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Dec 4</td>
+                                    <td>Mobbin</td>
+                                    <td>Brex ... 2502</td>
+                                    <td>Service</td>
+                                    <td>Wire</td>
+                                    <td>Missing</td>
+                                    <td>$10.60</td>
+                                    <td><span class="status-badge status-pending">Pending</span></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Dec 9</td>
+                                    <td>Internal Transfer</td>
+                                    <td>Chase ... 2502</td>
+                                    <td>Cloud</td>
+                                    <td>Transfer</td>
+                                    <td>N/A</td>
+                                    <td>$10.60</td>
+                                    <td><span class="status-badge status-done">Done</span></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Jan 2</td>
+                                    <td>Amazon Web</td>
+                                    <td>Brex ... 2502</td>
+                                    <td>Revenue</td>
+                                    <td>ACH</td>
+                                    <td>Attached</td>
+                                    <td>$10.60</td>
+                                    <td><span class="status-badge status-pending">Pending</span></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Jan 4</td>
+                                    <td>Stripe Payout</td>
+                                    <td>Chase ... 2502</td>
+                                    <td>Service</td>
+                                    <td>Transfer</td>
+                                    <td>Missing</td>
+                                    <td>$10.60</td>
+                                    <td><span class="status-badge status-pending">Pending</span></td>
+                                </tr>
+                                <!-- Fillers to show scrolling -->
+                                <tr><td></td><td>Jan 5</td><td>Test Item</td><td>Chase ... 1111</td><td>Cloud</td><td>Wire</td><td>N/A</td><td>$5.00</td><td><span class="status-badge status-done">Done</span></td></tr>
+                                <tr><td></td><td>Jan 6</td><td>Test Item</td><td>Chase ... 1111</td><td>Cloud</td><td>Wire</td><td>N/A</td><td>$5.00</td><td><span class="status-badge status-done">Done</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+            
+            <div class="resize-handle"></div>
+        </div>
+    </div>
+
+</body>
+</html>
