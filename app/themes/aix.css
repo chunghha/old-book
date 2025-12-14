@@ -1,0 +1,247 @@
+/* app/themes/aix.css */
+
+.theme-aix {
+  --aix-bg: #aeb2c3;
+  --aix-surface: #e0e0e0;
+  --aix-panel: #e6e6e6;
+  --aix-muted: #6b6b6b;
+  --aix-text: #111111;
+  --aix-border: #9a9a9a;
+  --aix-highlight: #cfd8dc;
+  --aix-accent: #0b74b8;
+  --aix-shadow-dark: rgba(0, 0, 0, 0.08);
+  --aix-input-bg: #d9d9d9;
+
+  --motif-bg: #aeb2c3;
+  --motif-light: #e0e0e0;
+  --motif-highlight: #ffffff;
+  --motif-shadow: #696969;
+  --motif-dark-shadow: #000000;
+  --motif-active-title: #4b6e8a;
+}
+
+/* Desktop Background & Font */
+.theme-aix .desktop-layer {
+  background-color: #2f4f4f;
+  color: var(--aix-text);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-size: 13px;
+}
+
+.theme-aix h1,
+.theme-aix h2,
+.theme-aix h3 {
+  font-weight: bold !important;
+}
+
+/* Window Chrome */
+.theme-aix .mwm-window {
+  background-color: var(--motif-bg);
+  border: 7px solid var(--motif-bg);
+  box-shadow:
+    -1px -1px 0 0 var(--motif-highlight),
+    1px 1px 0 0 var(--motif-dark-shadow),
+    10px 10px 0px rgba(0, 0, 0, 0.5);
+}
+
+.theme-aix .mwm-outer-frame {
+  border-top: 1px solid var(--motif-highlight);
+  border-left: 1px solid var(--motif-highlight);
+  border-right: 1px solid var(--motif-dark-shadow);
+  border-bottom: 1px solid var(--motif-dark-shadow);
+  background: var(--motif-bg);
+}
+
+.theme-aix .title-bar {
+  background-color: var(--motif-active-title);
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px;
+  margin-bottom: 2px;
+  border: 1px solid var(--motif-dark-shadow);
+}
+
+.theme-aix .title-text {
+  color: white;
+  font-weight: bold;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  margin-left: 8px;
+  font-family: "Helvetica", Arial, sans-serif !important;
+}
+
+.theme-aix .mwm-btn {
+  width: 24px;
+  height: 24px;
+  background-color: var(--motif-bg);
+  border-top: 2px solid var(--motif-highlight);
+  border-left: 2px solid var(--motif-highlight);
+  border-right: 2px solid var(--motif-dark-shadow);
+  border-bottom: 2px solid var(--motif-dark-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.theme-aix .mwm-btn:active {
+  border-top: 2px solid var(--motif-dark-shadow);
+  border-left: 2px solid var(--motif-dark-shadow);
+  border-right: 2px solid var(--motif-highlight);
+  border-bottom: 2px solid var(--motif-highlight);
+}
+
+.theme-aix .icon-min {
+  width: 6px;
+  height: 6px;
+  border: 1px solid black;
+  background: black;
+}
+.theme-aix .icon-max {
+  width: 14px;
+  height: 14px;
+  border: 1px solid black;
+}
+.theme-aix .icon-menu {
+  width: 10px;
+  height: 2px;
+  background: black;
+  box-shadow: 0 0 0 1px white inset;
+}
+
+/* --- GRAPH & PANEL OVERRIDES --- */
+
+/* Motif Panels */
+.theme-aix .panel-container {
+  background: var(--motif-bg) !important;
+  border-top: 2px solid var(--motif-highlight) !important;
+  border-left: 2px solid var(--motif-highlight) !important;
+  border-right: 2px solid var(--motif-dark-shadow) !important;
+  border-bottom: 2px solid var(--motif-dark-shadow) !important;
+  border-radius: 0 !important;
+}
+
+/* X11 Style Black Chart */
+.theme-aix .chart-frame {
+  background: #000 !important;
+  border-top: 2px solid var(--motif-dark-shadow) !important;
+  border-left: 2px solid var(--motif-dark-shadow) !important;
+  border-right: 2px solid var(--motif-highlight) !important;
+  border-bottom: 2px solid var(--motif-highlight) !important;
+  border-radius: 0 !important;
+}
+
+.theme-aix .grid-line {
+  stroke: #00ff00 !important; /* Green terminal grid */
+  stroke-opacity: 0.3 !important;
+}
+
+.theme-aix .tooltip-bg {
+  fill: #ffffcc !important;
+  stroke: #000 !important;
+}
+.theme-aix .tooltip-text {
+  fill: #000 !important;
+  font-family: monospace !important;
+}
+
+/* Category Bars */
+.theme-aix .cat-bar-container {
+  border: 2px solid var(--motif-dark-shadow) !important;
+  border-radius: 0 !important;
+}
+
+/* --- BUTTON OVERRIDES --- */
+.theme-aix button,
+.theme-aix .bg-cyan-600,
+.theme-aix .bg-rose-600,
+.theme-aix .bg-slate-700,
+.theme-aix .bg-slate-800 {
+  border-radius: 0 !important;
+  background: var(--motif-bg) !important;
+  color: black !important;
+  border-top: 2px solid var(--motif-highlight) !important;
+  border-left: 2px solid var(--motif-highlight) !important;
+  border-right: 2px solid var(--motif-dark-shadow) !important;
+  border-bottom: 2px solid var(--motif-dark-shadow) !important;
+  font-weight: bold !important;
+  font-family: inherit !important;
+  box-shadow: none !important;
+}
+
+.theme-aix button:active {
+  border-top: 2px solid var(--motif-dark-shadow) !important;
+  border-left: 2px solid var(--motif-dark-shadow) !important;
+  border-right: 2px solid var(--motif-highlight) !important;
+  border-bottom: 2px solid var(--motif-highlight) !important;
+}
+
+/* --- LANDING PAGE / OVERVIEW SHIMS --- */
+.theme-aix .bg-gradient-to-b,
+.theme-aix .bg-gradient-to-r {
+  background: none !important;
+}
+
+.theme-aix .bg-slate-800\/50,
+.theme-aix .backdrop-blur-sm {
+  background: var(--motif-bg) !important;
+  border-top: 2px solid var(--motif-highlight) !important;
+  border-left: 2px solid var(--motif-highlight) !important;
+  border-right: 2px solid var(--motif-dark-shadow) !important;
+  border-bottom: 2px solid var(--motif-dark-shadow) !important;
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+}
+
+.theme-aix .text-gray-300,
+.theme-aix .text-gray-400,
+.theme-aix .text-slate-300,
+.theme-aix .text-slate-400,
+.theme-aix .text-white,
+.theme-aix .text-transparent {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+}
+
+/* Shim Tailwind Colors */
+.theme-aix .text-slate-100,
+.theme-aix .text-slate-200,
+.theme-aix .text-slate-300,
+.theme-aix .text-slate-400,
+.theme-aix .text-slate-900,
+.theme-aix .text-white {
+  color: #000 !important;
+}
+
+.theme-aix .bg-slate-800,
+.theme-aix .bg-slate-900 {
+  background: var(--motif-bg) !important;
+  border-top: 2px solid var(--motif-highlight);
+  border-left: 2px solid var(--motif-highlight);
+  border-right: 2px solid var(--motif-dark-shadow);
+  border-bottom: 2px solid var(--motif-dark-shadow);
+  border-radius: 0 !important;
+  color: #000 !important;
+}
+
+.theme-aix input,
+.theme-aix select,
+.theme-aix textarea {
+  background: #d9d9d9 !important;
+  border-top: 2px solid var(--motif-dark-shadow) !important;
+  border-left: 2px solid var(--motif-dark-shadow) !important;
+  border-right: 2px solid var(--motif-highlight) !important;
+  border-bottom: 2px solid var(--motif-highlight) !important;
+  color: #000 !important;
+  border-radius: 0 !important;
+  font-family: inherit !important;
+}
+
+.theme-aix header,
+.theme-aix aside,
+.theme-aix footer {
+  border-color: var(--motif-shadow) !important;
+  background: var(--motif-bg);
+}

@@ -1,0 +1,144 @@
+/* app/themes/kde.css */
+
+.theme-kde {
+  --kde-bg: #efefef;
+  --kde-surface: #fbfbfb;
+  --kde-text: #222222;
+}
+
+/* Desktop Background & Font */
+.theme-kde .desktop-layer {
+  background: linear-gradient(180deg, #486a88 0%, #2c4558 100%);
+  color: #222;
+  font-family: "Tahoma", "Verdana", "Segoe UI", sans-serif !important;
+  font-size: 12px;
+}
+
+.theme-kde .window-title {
+  font-weight: bold !important;
+  font-size: 12px !important;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Window Chrome */
+.theme-kde .kwin-window {
+  background-color: var(--kde-bg);
+  border: 1px solid #333;
+  border-radius: 6px 6px 0 0;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+.theme-kde .title-bar {
+  height: 26px;
+  background: linear-gradient(to bottom, #8cbaff, #5784e0);
+  border-bottom: 1px solid #3c5d9c;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+  color: white;
+}
+
+/* --- GRAPH & PANEL OVERRIDES --- */
+
+/* KDE Panels (Light, rounded) */
+.theme-kde .panel-container {
+  background: #fbfbfb !important;
+  border: 1px solid #a0a0a0 !important;
+  border-radius: 3px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Chart Frame (White) */
+.theme-kde .chart-frame {
+  background: #fff !important;
+  border: 1px solid #dcdcdc !important;
+  border-radius: 0 !important;
+}
+
+.theme-kde .grid-line {
+  stroke: #e5e5e5 !important;
+}
+.theme-kde .tooltip-bg {
+  fill: #ffffe1 !important;
+  stroke: #000 !important;
+}
+.theme-kde .tooltip-text {
+  fill: #000 !important;
+}
+
+/* Category Bars */
+.theme-kde .cat-bar-container {
+  border: 1px solid #ccc !important;
+  border-radius: 3px !important;
+}
+
+/* --- BUTTON OVERRIDES --- */
+.theme-kde button,
+.theme-kde .bg-cyan-600,
+.theme-kde .bg-rose-600,
+.theme-kde .bg-slate-700,
+.theme-kde .bg-slate-800 {
+  background: linear-gradient(to bottom, #ffffff 0%, #eeeeee 100%) !important;
+  border: 1px solid #999 !important;
+  border-radius: 3px !important;
+  color: #000 !important;
+  text-shadow: none !important;
+  box-shadow: inset 0 1px 0 #fff !important;
+  font-family: inherit !important;
+}
+
+.theme-kde button:hover {
+  background: linear-gradient(to bottom, #fff 0%, #e6e6e6 100%) !important;
+  border-color: #888 !important;
+}
+
+.theme-kde button:active {
+  background: #dcdcdc !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* --- LANDING PAGE / OVERVIEW SHIMS --- */
+.theme-kde .bg-gradient-to-b,
+.theme-kde .bg-gradient-to-r {
+  background: none !important;
+}
+
+.theme-kde .bg-slate-800\/50,
+.theme-kde .backdrop-blur-sm {
+  background: #fff !important;
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+  backdrop-filter: none !important;
+}
+
+.theme-kde .text-gray-300,
+.theme-kde .text-gray-400,
+.theme-kde .text-slate-300,
+.theme-kde .text-slate-400,
+.theme-kde .text-white,
+.theme-kde .text-transparent {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+}
+
+/* Shim Tailwind Colors */
+.theme-kde .text-slate-100,
+.theme-kde .text-slate-400,
+.theme-kde .text-slate-900 {
+  color: #222 !important;
+}
+
+.theme-kde .bg-slate-800,
+.theme-kde .bg-slate-900 {
+  background: #fff !important;
+  border: 1px solid #aaa;
+  color: #222 !important;
+}
+
+.theme-kde header,
+.theme-kde aside,
+.theme-kde footer {
+  border-color: #ccc !important;
+  background: #efefef;
+}

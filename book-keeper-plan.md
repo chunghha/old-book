@@ -1,168 +1,98 @@
-Perfect! Adjusted plan for **TanStack Start with React**:
+# Book Keeper Implementation Plan
 
-## Updated Implementation Strategy
+## Project Goal
+A local-first personal finance application with retro Desktop Environment themes (KDE, AIX, BeOS, CDE).
 
-### 1. **TanStack Start Architecture**
+**Current Status:** UI Prototype Complete (React + Tailwind v4 + LocalStorage).
+**Next Phase:** Desktop Native Migration (Tauri + SQLite).
 
-```
+## Architecture
+
+### 1. Tech Stack
+- **Frontend:** TanStack Start (React), Tailwind CSS v4, Lucide Icons.
+- **State Management:** Zustand (migrating to Async Actions).
+- **Desktop Wrapper:** Tauri v2.
+- **Database:** SQLite (via `tauri-plugin-sql`).
+- **Routing:** Manual SPA Routing (currently), moving to TanStack Router for type-safety.
+
+### 2. Directory Structure (Planned)
+```text
 project/
+├── src-tauri/             # RUST: Native backend
+│   ├── src/
+│   │   ├── main.rs        # App entry
+│   │   └── lib.rs         # Command handlers
+│   ├── migrations/        # SQL migration files
+│   └── tauri.conf.json    # Window config
 ├── app/
-│   ├── routes/
-│   │   ├── __root.tsx          // Root layout with theme provider
-│   │   ├── index.tsx            // Dashboard/home
-│   │   ├── transactions.tsx     // Transaction view
-│   │   └── settings.tsx         // Theme selector + preferences
-│   ├── components/
-│   │   ├── ui/                  // Themed UI primitives
-│   │   ├── Window.tsx           // Window chrome wrapper
-│   │   ├── Sidebar.tsx
-│   │   ├── TransactionTable.tsx
-│   │   └── Chart.tsx
-│   ├── themes/
-│   │   ├── index.ts             // Theme provider/context
-│   │   ├── aix.css
-│   │   ├── beos.css
-│   │   ├── cde.css
-│   │   └── kde.css
-│   ├── stores/
-│   │   └── transactions.ts      // Zustand store
 │   ├── db/
-│   │   └── client.ts            // Dexie.js for IndexedDB
-│   └── router.tsx
-├── public/
-└── app.config.ts
+│   │   ├── client.ts      # Abstracted DB adapter
+│   │   ├── sqlite.ts      # Tauri implementation
+│   │   └── local.ts       # Web fallback (localStorage)
+│   ├── stores/
+│   │   └── transactions.ts # Refactored for Async
 ```
 
-### 2. **Key TanStack Start Features to Leverage**
+## Implementation Roadmap
 
-**File-based Routing:**
+### Phase 1: UI & Themes (✅ COMPLETED)
 
-- `/` - Dashboard overview
-- `/transactions` - Full transaction list (what I built above)
-- `/accounts` - Account management
-- `/settings` - Theme switcher + app config
+Set up Vite + React + Tailwind v4.
 
-**Data Loading:**
+Implement "Desktop Layer" architecture for centering windows.
 
-```typescript
-// app/routes/transactions.tsx
-export const Route = createFileRoute('/transactions')({
-  loader: async () => {
-    const db = await getDatabase();
-    return db.transactions.toArray();
-  }
-})
-```
+Create Theme Engine (CSS Variables + Scoped Classes).
 
-**Server Functions (for future sync):**
+Implement Themes:
 
-```typescript
-// app/routes/api/sync.ts
-export async function POST({ request }) {
-  const data = await request.json();
-  // Sync to remote DB or cloud storage
-  return { synced: true };
-}
-```
+KDE (Plastic)
 
-### 3. **Local-First with TanStack Start**
+AIX (Motif)
 
-**Client-Side State:**
+BeOS (Yellow Tab)
 
-- Use Zustand for UI state (theme, filters, selections)
-- Use TanStack Query for data fetching/caching
-- Dexie.js for IndexedDB persistence
+CDE (Solaris Teal)
 
-**Pattern:**
+Build Graph/Chart components with SVG.
 
-```typescript
-// In route loader
-loader: async () => {
-  const cached = await db.transactions.toArray();
-  return cached; // Instant load from IndexedDB
-}
+Basic CRUD with localStorage.
 
-// In component
-const { data } = useSuspenseQuery({
-  queryKey: ['transactions'],
-  queryFn: () => db.transactions.toArray()
-});
-```
+### Phase 2: Tauri Integration (Current Focus)
 
-### 4. **Theme System with TanStack Start**
+Initialize Tauri: Add Rust backend to the project.
 
-**CSS Modules with theme variants:**
+Configure Windows: Remove system chrome (frame: false) so our CSS themes handle the title bars and window controls.
 
-```typescript
-// app/themes/index.ts
-import './aix.css';
-import './beos.css';
-import './cde.css';
-import './kde.css';
+Window Dragging: Connect the CSS Title Bars (data-tauri-drag-region) to native window movement.
+Phase 3: Database Migration (SQLite)
 
-export const themes = {
-  aix: 'theme-aix',
-  beos: 'theme-beos',
-  cde: 'theme-cde',
-  kde: 'theme-kde'
-};
+Install Plugin: Add @tauri-apps/plugin-sql.
 
-// In __root.tsx
-<html className={currentTheme}>
-  <Outlet />
-</html>
-```
+Schema Design:
+code
+SQL
+CREATE TABLE transactions (
+  id TEXT PRIMARY KEY,
+  date TEXT NOT NULL,
+  amount REAL NOT NULL,
+  type TEXT CHECK(type IN ('credit', 'debit')),
+  description TEXT,
+  account TEXT,
+  category TEXT,
+  tags TEXT, -- JSON string or comma-separated
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
 
-### 5. **Advantages of TanStack Start**
+Store Refactor:
+Convert useTransactionsStore from synchronous to asynchronous.
+Implement a Data Adapter pattern:
+interface StorageAdapter { getAll(): Promise<Tx[]>; add(tx): Promise<void>; ... }
+This allows the app to still run in "Web Mode" (demo) vs "App Mode" (SQLite).
 
-1. **Type-safe routing** with file-based structure
-2. **Built-in data loading** with suspense boundaries
-3. **SSR capability** (though we're client-first, nice for initial shell)
-4. **Streaming support** for large transaction lists
-5. **Dev tooling** - React Query devtools, router devtools
-6. **Vite-powered** - Fast HMR for theme development
+### Phase 4: Advanced Features
 
-### 6. **Implementation Order**
+TanStack Query: Replace manual useEffect fetching with useQuery for better caching/loading states.
 
-**Phase 1: Foundation (Week 1)**
+Virtualization: Use TanStack Virtual for the transaction table to handle 10,000+ rows.
 
-- Set up TanStack Start project
-- Create IndexedDB schema with Dexie
-- Build KDE theme (most modern baseline)
-- Basic CRUD routes
-
-**Phase 2: Features (Week 2)**
-
-- Transaction table with sorting/filtering
-- Chart components with real data
-- Search functionality
-- Import/Export CSV
-
-**Phase 3: Multi-theme (Week 3)**
-
-- Extract KDE theme to CSS module
-- Implement AIX/Motif theme
-- Theme switcher in settings route
-- Theme persistence
-
-**Phase 4: Polish (Week 4)**
-
-- BeOS and CDE themes
-- Keyboard shortcuts per OS
-- Offline indicator
-- Data backup/restore
-
-I've created a **working prototype** above with the KDE theme fully functional, including:
-
-- ✅ Local storage persistence (simulating IndexedDB)
-- ✅ Add/delete transactions
-- ✅ Search/filter functionality
-- ✅ Checkbox selection
-- ✅ Live charts with recharts
-- ✅ Authentic KDE3 styling
-
-Would you like me to:
-
-1. Create the full TanStack Start project structure with routing?
-2. Add the other three themes (AIX, BeOS, CDE) with theme switching?
-3. Implement proper IndexedDB with Dexie.js?
+File System Access: Native Import/Export using Tauri FS dialogs.

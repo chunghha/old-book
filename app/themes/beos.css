@@ -1,0 +1,198 @@
+/* app/themes/beos.css */
+
+.theme-beos {
+  --beos-desktop: #336698;
+  --beos-grey: #d8d8d8;
+  --beos-yellow: #ffcc00;
+  --beos-light: #ffffff;
+  --beos-shadow: #999999;
+  --beos-dark-shadow: #555555;
+  --beos-text: #000000;
+}
+
+/* Desktop Background & Font */
+.theme-beos .desktop-layer {
+  background-color: var(--beos-desktop);
+  font-family: "Verdana", "Geneva", "DejaVu Sans", sans-serif !important;
+  font-size: 12px;
+  color: black;
+}
+
+.theme-beos .window-title {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #000 !important;
+  flex: 1;
+}
+
+/* Window Chrome */
+.theme-beos .window-container {
+  filter: drop-shadow(4px 4px 6px rgba(0, 0, 0, 0.4));
+}
+
+.theme-beos .window-tab {
+  background-color: var(--beos-yellow);
+  height: 24px;
+  width: 200px;
+  border-top: 1px solid #ffe680;
+  border-left: 1px solid #ffe680;
+  border-right: 1px solid #b38f00;
+  border-radius: 4px 4px 0 0;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  position: relative;
+  z-index: 2;
+  margin-left: 0;
+}
+
+.theme-beos .tab-close {
+  width: 12px;
+  height: 12px;
+  background: #cc3333;
+  margin-right: 6px;
+  border: 1px solid #550000;
+  box-shadow: inset 1px 1px #ff6666;
+}
+
+.theme-beos .window-frame {
+  background-color: var(--beos-grey);
+  border-top: 1px solid var(--beos-light);
+  border-left: 1px solid var(--beos-light);
+  border-right: 1px solid var(--beos-dark-shadow);
+  border-bottom: 1px solid var(--beos-dark-shadow);
+  padding: 8px;
+  position: relative;
+  box-shadow: -4px 0 0 var(--beos-yellow);
+  margin-left: 4px;
+}
+
+/* --- GRAPH & PANEL OVERRIDES --- */
+
+/* BeOS Panels */
+.theme-beos .panel-container {
+  background: var(--beos-grey) !important;
+  border-top: 1px solid var(--beos-light) !important;
+  border-left: 1px solid var(--beos-light) !important;
+  border-right: 1px solid var(--beos-dark-shadow) !important;
+  border-bottom: 1px solid var(--beos-dark-shadow) !important;
+  border-radius: 0 !important;
+}
+
+/* Chart Frame (White background common in BeOS apps) */
+.theme-beos .chart-frame {
+  background: #fff !important;
+  border-top: 1px solid var(--beos-dark-shadow) !important;
+  border-left: 1px solid var(--beos-dark-shadow) !important;
+  border-right: 1px solid var(--beos-light) !important;
+  border-bottom: 1px solid var(--beos-light) !important;
+  border-radius: 0 !important;
+}
+
+.theme-beos .grid-line {
+  stroke: #ddd !important;
+  stroke-dasharray: 0 !important; /* Solid light lines */
+}
+
+.theme-beos .tooltip-bg {
+  fill: #ffffe1 !important;
+  stroke: #000 !important;
+}
+
+.theme-beos .tooltip-text {
+  fill: #000 !important;
+  font-family: inherit !important;
+}
+
+/* Category Bars */
+.theme-beos .cat-bar-container {
+  border: 1px solid #999 !important;
+  border-radius: 0 !important;
+}
+/* BeOS Palette */
+.theme-beos .cat-fill-1 {
+  background-color: #336698 !important;
+} /* Blue */
+.theme-beos .cat-fill-2 {
+  background-color: #ffcc00 !important;
+} /* Yellow */
+.theme-beos .cat-fill-3 {
+  background-color: #cc3333 !important;
+} /* Red */
+.theme-beos .cat-fill-4 {
+  background-color: #ffffff !important;
+} /* White */
+.theme-beos .cat-fill-5 {
+  background-color: #000000 !important;
+} /* Black */
+
+/* --- BUTTON OVERRIDES --- */
+.theme-beos button,
+.theme-beos .bg-cyan-600,
+.theme-beos .bg-rose-600,
+.theme-beos .bg-slate-700,
+.theme-beos .bg-slate-800 {
+  background-color: var(--beos-grey) !important;
+  color: black !important;
+  border-top: 1px solid var(--beos-light) !important;
+  border-left: 1px solid var(--beos-light) !important;
+  border-right: 1px solid var(--beos-dark-shadow) !important;
+  border-bottom: 1px solid var(--beos-dark-shadow) !important;
+  border-radius: 0 !important;
+  font-family: inherit !important;
+  box-shadow: none !important;
+}
+
+.theme-beos button:active {
+  border-top: 1px solid var(--beos-dark-shadow) !important;
+  border-left: 1px solid var(--beos-dark-shadow) !important;
+  border-right: 1px solid var(--beos-light) !important;
+  border-bottom: 1px solid var(--beos-light) !important;
+  background-color: #ccc !important;
+}
+
+/* --- LANDING PAGE / OVERVIEW SHIMS --- */
+.theme-beos .bg-gradient-to-b,
+.theme-beos .bg-gradient-to-r {
+  background: none !important;
+}
+
+.theme-beos .bg-slate-800\/50,
+.theme-beos .backdrop-blur-sm {
+  background: var(--beos-grey) !important;
+  border: 1px solid var(--beos-dark-shadow) !important;
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+}
+
+.theme-beos .text-gray-300,
+.theme-beos .text-gray-400,
+.theme-beos .text-slate-300,
+.theme-beos .text-slate-400,
+.theme-beos .text-white,
+.theme-beos .text-transparent {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+}
+
+/* Shim Tailwind Colors */
+.theme-beos .text-slate-100,
+.theme-beos .text-slate-400,
+.theme-beos .text-slate-900,
+.theme-beos .text-white {
+  color: #000 !important;
+}
+
+.theme-beos .bg-slate-800,
+.theme-beos .bg-slate-900 {
+  background: #fff !important;
+  border: 1px solid #999;
+  color: #000 !important;
+}
+
+.theme-beos header,
+.theme-beos aside,
+.theme-beos footer {
+  border-color: #999 !important;
+  background: transparent;
+}

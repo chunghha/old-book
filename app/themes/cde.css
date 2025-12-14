@@ -1,0 +1,216 @@
+/* app/themes/cde.css */
+
+.theme-cde {
+  --cde-bg-top: #efe7dd;
+  --cde-bg-bottom: #d8d2c8;
+  --cde-surface: #efe7dd;
+  --cde-panel: #ded4c8;
+  --cde-muted: #6b6156;
+  --cde-text: #111111;
+  --cde-border: #a79b90;
+  --cde-highlight: #ffffff;
+  --cde-accent: #0e6aa8;
+  --cde-radius: 6px;
+  --cde-shadow: 0 4px 12px rgba(16, 18, 20, 0.06);
+  --win-bg: #bfbfbf;
+  --win-light: #ffffff;
+  --win-shadow: #606060;
+  --win-dark-shadow: #000000;
+  --select-bg: #9eb2b8;
+}
+
+/* Desktop Background & Font */
+.theme-cde .desktop-layer {
+  background: linear-gradient(180deg, #4f7d93, #3a5d6e);
+  color: var(--cde-text);
+  font-family:
+    "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif !important;
+  font-size: 13px;
+}
+
+/* Window Title (Serif Bold) */
+.theme-cde .window-title {
+  font-family: "Times New Roman", Times, serif !important;
+  font-weight: bold !important;
+  font-size: 15px !important;
+  letter-spacing: 0.5px;
+  color: white !important;
+}
+
+/* Window Chrome */
+.theme-cde .window {
+  box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.3);
+}
+
+.theme-cde .cde-raised {
+  border-top: 2px solid var(--win-light);
+  border-left: 2px solid var(--win-light);
+  border-right: 2px solid var(--win-shadow);
+  border-bottom: 2px solid var(--win-shadow);
+  background-color: var(--win-bg);
+}
+
+.theme-cde .title-bar {
+  background-color: #4f7d93;
+  padding: 4px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 2px solid var(--win-bg);
+  outline: 4px solid var(--win-bg);
+  margin-bottom: 4px;
+  color: white !important;
+}
+
+.theme-cde .app-content {
+  background-color: var(--win-bg);
+  padding: 6px;
+  border: 4px solid var(--win-bg);
+  color: black;
+}
+
+/* --- GRAPH & PANEL OVERRIDES --- */
+
+/* Ensure panels look like CDE panels (raised) */
+.theme-cde .panel-container {
+  background: var(--win-bg) !important;
+  border-top: 2px solid var(--win-light) !important;
+  border-left: 2px solid var(--win-light) !important;
+  border-right: 2px solid var(--win-shadow) !important;
+  border-bottom: 2px solid var(--win-shadow) !important;
+  border-radius: 0 !important;
+}
+
+/* The chart frame should be sunken (inset) and black */
+.theme-cde .chart-frame {
+  background: #000 !important;
+  border-top: 2px solid var(--win-shadow) !important;
+  border-left: 2px solid var(--win-shadow) !important;
+  border-right: 2px solid var(--win-light) !important;
+  border-bottom: 2px solid var(--win-light) !important;
+  border-radius: 0 !important;
+}
+
+/* Chart elements */
+.theme-cde .grid-line {
+  stroke: #333 !important;
+  stroke-dasharray: 2 2 !important;
+}
+.theme-cde .tooltip-bg {
+  fill: #ffffcc !important;
+  stroke: #000 !important;
+}
+.theme-cde .tooltip-text {
+  fill: #000 !important;
+  font-family: monospace !important;
+}
+
+/* Category bars */
+.theme-cde .cat-bar-container {
+  border: 1px solid #000 !important;
+  border-radius: 0 !important;
+}
+.theme-cde .cat-fill-1 {
+  background-color: #4ecdc4 !important;
+}
+.theme-cde .cat-fill-2 {
+  background-color: #4d8ab2 !important;
+}
+.theme-cde .cat-fill-3 {
+  background-color: #ffd700 !important;
+}
+.theme-cde .cat-fill-4 {
+  background-color: #9b59b6 !important;
+}
+.theme-cde .cat-fill-5 {
+  background-color: #2ecc71 !important;
+}
+
+/* --- BUTTON OVERRIDES --- */
+/* Force all buttons to look like CDE buttons, ignoring Tailwind colors */
+.theme-cde button,
+.theme-cde .bg-cyan-600,
+.theme-cde .bg-rose-600,
+.theme-cde .bg-slate-700,
+.theme-cde .bg-slate-800 {
+  background: var(--win-bg) !important;
+  color: black !important; /* Ensure text is visible */
+  border-top: 2px solid var(--win-light) !important;
+  border-left: 2px solid var(--win-light) !important;
+  border-right: 2px solid var(--win-shadow) !important;
+  border-bottom: 2px solid var(--win-shadow) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  font-weight: bold !important;
+  font-family: inherit !important;
+}
+
+.theme-cde button:active {
+  border-top: 2px solid var(--win-shadow) !important;
+  border-left: 2px solid var(--win-shadow) !important;
+  border-right: 2px solid var(--win-light) !important;
+  border-bottom: 2px solid var(--win-light) !important;
+  transform: none !important;
+}
+
+/* --- LANDING PAGE / OVERVIEW SHIMS --- */
+.theme-cde .bg-gradient-to-b,
+.theme-cde .bg-gradient-to-r {
+  background: none !important;
+}
+
+.theme-cde .bg-slate-800\/50,
+.theme-cde .backdrop-blur-sm {
+  background: var(--win-bg) !important;
+  border-top: 2px solid var(--win-light) !important;
+  border-left: 2px solid var(--win-light) !important;
+  border-right: 2px solid var(--win-shadow) !important;
+  border-bottom: 2px solid var(--win-shadow) !important;
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+}
+
+.theme-cde .text-gray-300,
+.theme-cde .text-gray-400,
+.theme-cde .text-slate-300,
+.theme-cde .text-slate-400,
+.theme-cde .text-white,
+.theme-cde .text-transparent {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+}
+
+/* --- Shim Tailwind Colors --- */
+.theme-cde .text-slate-100,
+.theme-cde .text-slate-200,
+.theme-cde .text-slate-300,
+.theme-cde .text-slate-400,
+.theme-cde .text-slate-900,
+.theme-cde .text-white {
+  color: #222 !important;
+}
+
+.theme-cde .bg-slate-800,
+.theme-cde .bg-slate-900 {
+  background: var(--cde-surface) !important;
+  border: 1px solid var(--cde-border);
+  color: #222 !important;
+  box-shadow: inset 1px 1px 0 #fff;
+}
+
+.theme-cde header,
+.theme-cde aside,
+.theme-cde footer {
+  border-color: var(--cde-border) !important;
+  background: var(--cde-panel);
+}
+
+.theme-cde input {
+  background: #fff !important;
+  color: #000 !important;
+  border: 1px solid #777 !important;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.2) !important;
+  font-family: inherit !important;
+}

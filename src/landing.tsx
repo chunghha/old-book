@@ -6,22 +6,16 @@ import {
   Shield,
   Waves,
   Sparkles,
+  Layers,
 } from "lucide-react";
 
 /**
- * App Entry - Static Landing Page
- *
- * The repository now contains a small local-first Book Keeper app under
- * `app/routes/*`. This file preserves the original landing content while
- * acting as a simple entry that links into the routed app pages we added:
- * - /transactions
- * - /settings
- *
- * Note: we intentionally do not recreate a file-route here to avoid conflicting
- * with the route files created under `app/routes`.
+ * Small landing component used by `src/main.tsx`.
+ * This mirrors the original static landing page and is rendered when the
+ * root path ("/") is visited.
  */
 
-export default function App() {
+export default function Landing() {
   const features = [
     {
       icon: <Zap className="w-12 h-12 text-cyan-400" />,
@@ -62,16 +56,13 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+    <div className="h-full min-h-full bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 overflow-y-auto">
       <section className="relative py-20 px-6 text-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10" />
         <div className="relative max-w-5xl mx-auto">
           <div className="flex items-center justify-center gap-6 mb-6">
-            <img
-              src="/tanstack-circle-logo.png"
-              alt="TanStack Logo"
-              className="w-24 h-24 md:w-32 md:h-32"
-            />
+            {/* Replaced broken img with Layers icon */}
+            <Layers className="w-24 h-24 md:w-32 md:h-32 text-cyan-400" />
             <h1 className="text-6xl md:text-7xl font-black text-white [letter-spacing:-0.08em]">
               <span className="text-gray-300">TANSTACK</span>{" "}
               <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
@@ -79,6 +70,7 @@ export default function App() {
               </span>
             </h1>
           </div>
+
           <p className="text-2xl md:text-3xl text-gray-300 mb-4 font-light">
             The framework for next generation AI applications
           </p>
@@ -87,6 +79,7 @@ export default function App() {
             Build modern applications with server functions, streaming, and type
             safety.
           </p>
+
           <div className="flex flex-col items-center gap-4">
             <div className="flex gap-3">
               <a
@@ -102,6 +95,7 @@ export default function App() {
                 Settings
               </a>
             </div>
+
             <p className="text-gray-400 text-sm mt-2">
               Explore the local-first Book Keeper prototype — transactions are
               persisted in browser storage. Visit{" "}
