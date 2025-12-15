@@ -11,6 +11,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { ThemeProvider, useTheme } from "../themes";
+import { minimizeWindow, toggleMaximize, closeWindow } from "../lib/window";
 
 export default Root;
 
@@ -67,6 +68,8 @@ function AppShell({ children }: { children?: React.ReactNode }) {
 /*
    NOTE: 'data-tauri-drag-region' is added to title bars.
    This allows the user to drag the frameless window around the screen.
+
+   The window control buttons now call the Tauri window API functions.
 */
 
 function CDEWindow({ children }: { children: React.ReactNode }) {
@@ -77,20 +80,35 @@ function CDEWindow({ children }: { children: React.ReactNode }) {
         data-tauri-drag-region
       >
         <div className="window-controls">
-          <div className="win-btn">
+          <button
+            type="button"
+            className="win-btn"
+            onClick={minimizeWindow}
+            title="Minimize"
+          >
             <Minus size={10} strokeWidth={4} />
-          </div>
+          </button>
         </div>
         <div className="window-title pointer-events-none">
           Acme Inc - Book Keeper
         </div>
         <div className="window-controls">
-          <div className="win-btn">
+          <button
+            type="button"
+            className="win-btn"
+            onClick={toggleMaximize}
+            title="Maximize"
+          >
             <Square size={8} fill="currentColor" />
-          </div>
-          <div className="win-btn">
+          </button>
+          <button
+            type="button"
+            className="win-btn"
+            onClick={closeWindow}
+            title="Close"
+          >
             <X size={12} strokeWidth={3} />
-          </div>
+          </button>
         </div>
       </div>
       <div className="app-content flex-1 overflow-hidden relative flex flex-col">
@@ -104,9 +122,42 @@ function BeOSWindow({ children }: { children: React.ReactNode }) {
   return (
     <div className="window-container flex flex-col !w-[1400px] !h-[900px] max-w-full max-h-full filter drop-shadow-lg">
       <div className="window-tab select-none shrink-0" data-tauri-drag-region>
-        <div className="tab-close" />
+        <button
+          type="button"
+          className="tab-close"
+          onClick={closeWindow}
+          title="Close"
+        />
         <div className="window-title pointer-events-none">
           Acme Inc : Book Keeper
+        </div>
+        <div className="flex gap-1">
+          <button
+            type="button"
+            className="tab-btn"
+            onClick={minimizeWindow}
+            title="Minimize"
+            style={{
+              width: 12,
+              height: 12,
+              background: "#FFD700",
+              border: "1px solid #333",
+              cursor: "pointer",
+            }}
+          />
+          <button
+            type="button"
+            className="tab-btn"
+            onClick={toggleMaximize}
+            title="Maximize"
+            style={{
+              width: 12,
+              height: 12,
+              background: "#32CD32",
+              border: "1px solid #333",
+              cursor: "pointer",
+            }}
+          />
         </div>
       </div>
       <div className="window-frame flex-1 overflow-hidden flex flex-col">
@@ -121,19 +172,34 @@ function AIXWindow({ children }: { children: React.ReactNode }) {
   return (
     <div className="mwm-window !w-[1400px] !h-[900px] max-w-full max-h-full flex flex-col">
       <div className="title-bar select-none shrink-0" data-tauri-drag-region>
-        <div className="mwm-btn ml-[2px]">
+        <button
+          type="button"
+          className="mwm-btn ml-[2px]"
+          onClick={closeWindow}
+          title="Close"
+        >
           <div className="icon-menu" />
-        </div>
+        </button>
         <div className="title-text flex-1 pointer-events-none">
           acme_inc : book_keeper
         </div>
         <div className="flex gap-[2px] mr-[2px]">
-          <div className="mwm-btn">
+          <button
+            type="button"
+            className="mwm-btn"
+            onClick={minimizeWindow}
+            title="Minimize"
+          >
             <div className="icon-min" />
-          </div>
-          <div className="mwm-btn">
+          </button>
+          <button
+            type="button"
+            className="mwm-btn"
+            onClick={toggleMaximize}
+            title="Maximize"
+          >
             <div className="icon-max" />
-          </div>
+          </button>
         </div>
       </div>
       <div className="mwm-outer-frame flex-1 overflow-hidden flex flex-col">
@@ -152,10 +218,33 @@ function KDEWindow({ children }: { children: React.ReactNode }) {
           <div className="window-title">Acme Inc - Book Keeper</div>
         </div>
         <div className="window-controls">
-          <div className="win-btn">?</div>
-          <div className="win-btn">_</div>
-          <div className="win-btn">□</div>
-          <div className="win-btn bg-red-800/50 border-red-900">X</div>
+          <button type="button" className="win-btn" title="Help">
+            ?
+          </button>
+          <button
+            type="button"
+            className="win-btn"
+            onClick={minimizeWindow}
+            title="Minimize"
+          >
+            _
+          </button>
+          <button
+            type="button"
+            className="win-btn"
+            onClick={toggleMaximize}
+            title="Maximize"
+          >
+            □
+          </button>
+          <button
+            type="button"
+            className="win-btn bg-red-800/50 border-red-900"
+            onClick={closeWindow}
+            title="Close"
+          >
+            X
+          </button>
         </div>
       </div>
       <div className="flex-1 bg-[#efefef] flex flex-col overflow-hidden text-[#222]">

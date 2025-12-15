@@ -27,6 +27,10 @@ interface TransactionsState {
       type: TransactionType;
     },
   ) => Promise<void>;
+  updateTransaction: (
+    id: string,
+    patch: Partial<Omit<Transaction, "id" | "createdAt">>,
+  ) => Promise<void>;
   deleteTransaction: (id: string) => Promise<void>;
   bulkDelete: (ids: string[]) => Promise<void>;
   importJSON: (json: string) => Promise<{ added: number; errors?: number }>;
@@ -88,6 +92,15 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => {
 
       const db = await getDatabase();
       await db.add(tx);
+
+      // Reload to ensure sync
+      const all = await db.getAll();
+      set({ transactions: all });
+    },
+
+    updateTransaction: async (id, patch) => {
+      const db = await getDatabase();
+      await db.update(id, patch);
 
       // Reload to ensure sync
       const all = await db.getAll();

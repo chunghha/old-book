@@ -3,97 +3,153 @@
 ## Project Goal
 A local-first personal finance application with retro Desktop Environment themes (KDE, AIX, BeOS, CDE).
 
-**Current Status:** UI Prototype Complete (React + Tailwind v4 + LocalStorage).
-**Next Phase:** Desktop Native Migration (Tauri + SQLite).
+**Current Status:** Phase 2 Complete (Tauri Integration with SQLite).
+**Next Phase:** Advanced Features (TanStack Query, Virtualization).
 
 ## Architecture
 
 ### 1. Tech Stack
 - **Frontend:** TanStack Start (React), Tailwind CSS v4, Lucide Icons.
-- **State Management:** Zustand (migrating to Async Actions).
+- **State Management:** Zustand (Async Actions).
 - **Desktop Wrapper:** Tauri v2.
 - **Database:** SQLite (via `tauri-plugin-sql`).
 - **Routing:** Manual SPA Routing (currently), moving to TanStack Router for type-safety.
 
-### 2. Directory Structure (Planned)
+### 2. Directory Structure
 ```text
 project/
 ├── src-tauri/             # RUST: Native backend
 │   ├── src/
 │   │   ├── main.rs        # App entry
-│   │   └── lib.rs         # Command handlers
-│   ├── migrations/        # SQL migration files
-│   └── tauri.conf.json    # Window config
+│   │   └── lib.rs         # Command handlers & plugin registration
+│   ├── capabilities/      # Tauri permissions
+│   │   └── default.json   # Window & SQL permissions
+│   └── tauri.conf.json    # Window config (frameless)
 ├── app/
 │   ├── db/
-│   │   ├── client.ts      # Abstracted DB adapter
-│   │   ├── sqlite.ts      # Tauri implementation
+│   │   ├── index.ts       # Abstracted DB adapter factory
+│   │   ├── types.ts       # StorageAdapter interface & Transaction type
+│   │   ├── sqlite.ts      # Tauri SQLite implementation
 │   │   └── local.ts       # Web fallback (localStorage)
+│   ├── lib/
+│   │   └── window.ts      # Tauri window controls (min/max/close)
 │   ├── stores/
-│   │   └── transactions.ts # Refactored for Async
+│   │   └── transactions.tsx # Zustand store (async actions)
+│   ├── themes/
+│   │   ├── index.tsx      # ThemeProvider & useTheme hook
+│   │   ├── kde.css        # KDE Plastic theme
+│   │   ├── aix.css        # AIX Motif theme
+│   │   ├── beos.css       # BeOS Yellow Tab theme
+│   │   └── cde.css        # CDE Solaris theme
+│   └── routes/
+│       ├── __root.tsx     # App shell with themed window chrome
+│       ├── transactions/  # Transaction list & form
+│       └── settings/      # Theme picker & import/export
+├── src/
+│   ├── main.tsx           # SPA router mount
+│   ├── landing.tsx        # Landing page component
+│   └── index.css          # Tailwind entry + base styles
+└── package.json
 ```
 
 ## Implementation Roadmap
 
 ### Phase 1: UI & Themes (✅ COMPLETED)
 
-Set up Vite + React + Tailwind v4.
+- [x] Set up Vite + React + Tailwind v4.
+- [x] Implement "Desktop Layer" architecture for centering windows.
+- [x] Create Theme Engine (CSS Variables + Scoped Classes).
+- [x] Implement Themes:
+  - [x] KDE (Plastic)
+  - [x] AIX (Motif)
+  - [x] BeOS (Yellow Tab)
+  - [x] CDE (Solaris Teal)
+- [x] Build Graph/Chart components with SVG.
+- [x] Basic CRUD with localStorage.
 
-Implement "Desktop Layer" architecture for centering windows.
+### Phase 2: Tauri Integration (✅ COMPLETED)
 
-Create Theme Engine (CSS Variables + Scoped Classes).
+- [x] Initialize Tauri: Add Rust backend to the project.
+- [x] Configure Windows: Remove system chrome (`decorations: false`) so CSS themes handle title bars.
+- [x] Window Dragging: Connect CSS Title Bars (`data-tauri-drag-region`) to native window movement.
+- [x] Window Controls: Implement minimize, maximize, and close buttons via `@tauri-apps/api/window`.
+- [x] Permissions: Configure capabilities for `core:window:*` and `sql:default`.
 
-Implement Themes:
+**Implementation Notes (Phase 2):**
+- Window controls are in `app/lib/window.ts` with graceful web fallback.
+- All four theme window chromes (CDE, BeOS, AIX, KDE) now have functional buttons.
+- Tauri config uses `frontendDist: "../dist"` to match Vite output.
 
-KDE (Plastic)
+### Phase 3: Database Migration (✅ COMPLETED)
 
-AIX (Motif)
-
-BeOS (Yellow Tab)
-
-CDE (Solaris Teal)
-
-Build Graph/Chart components with SVG.
-
-Basic CRUD with localStorage.
-
-### Phase 2: Tauri Integration (Current Focus)
-
-Initialize Tauri: Add Rust backend to the project.
-
-Configure Windows: Remove system chrome (frame: false) so our CSS themes handle the title bars and window controls.
-
-Window Dragging: Connect the CSS Title Bars (data-tauri-drag-region) to native window movement.
-
-### Phase 3: Database Migration (SQLite)
-
-Install Plugin: Add @tauri-apps/plugin-sql.
-
-Schema Design:
-code
-SQL
-CREATE TABLE transactions (
+- [x] Install Plugin: Add `@tauri-apps/plugin-sql` and register in `lib.rs`.
+- [x] Schema Design:
+```sql
+CREATE TABLE IF NOT EXISTS transactions (
   id TEXT PRIMARY KEY,
   date TEXT NOT NULL,
   amount REAL NOT NULL,
-  type TEXT CHECK(type IN ('credit', 'debit')),
+  type TEXT NOT NULL,
   description TEXT,
   account TEXT,
   category TEXT,
-  tags TEXT, -- JSON string or comma-separated
-  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+  tags TEXT,
+  created_at TEXT,
+  updated_at TEXT
 );
+```
+- [x] Store Refactor: Convert `useTransactionsStore` from synchronous to async.
+- [x] Data Adapter Pattern:
+```typescript
+interface StorageAdapter {
+  init(): Promise<void>;
+  getAll(): Promise<Transaction[]>;
+  add(tx: Transaction): Promise<void>;
+  update(id: string, tx: Partial<Transaction>): Promise<void>;
+  delete(id: string): Promise<void>;
+  bulkDelete(ids: string[]): Promise<void>;
+  clearAll(): Promise<void>;
+  import(txs: Transaction[]): Promise<void>;
+}
+```
+- [x] Dual Mode: App runs in "Web Mode" (localStorage) vs "App Mode" (SQLite) automatically.
 
-Store Refactor:
-Convert useTransactionsStore from synchronous to asynchronous.
-Implement a Data Adapter pattern:
-interface StorageAdapter { getAll(): Promise<Tx[]>; add(tx): Promise<void>; ... }
-This allows the app to still run in "Web Mode" (demo) vs "App Mode" (SQLite).
+### Phase 4: Advanced Features (🔜 NEXT)
 
-### Phase 4: Advanced Features
+- [ ] **TanStack Query:** Replace manual `useEffect` fetching with `useQuery` for better caching/loading states.
+- [ ] **Virtualization:** Use TanStack Virtual for the transaction table to handle 10,000+ rows.
+- [ ] **File System Access:** Native Import/Export using Tauri FS dialogs.
+- [ ] **Edit Transactions:** UI for editing existing transactions (store action ready).
+- [ ] **TanStack Router:** Replace manual SPA routing with type-safe file-based routing.
 
-TanStack Query: Replace manual useEffect fetching with useQuery for better caching/loading states.
+## Dependencies
 
-Virtualization: Use TanStack Virtual for the transaction table to handle 10,000+ rows.
+### Frontend (package.json)
+- `react` / `react-dom` ^19.x
+- `zustand` ^5.x
+- `tailwindcss` ^4.x
+- `@tailwindcss/vite` ^4.x
+- `lucide-react` ^0.561.x
+- `@tauri-apps/api` ^2.9.x
+- `@tauri-apps/plugin-sql` ^2.3.x
+- `@tanstack/react-query` ^5.x (installed, not yet used)
+- `@tanstack/react-router` ^1.x (installed, not yet used)
 
-File System Access: Native Import/Export using Tauri FS dialogs.
+### Backend (Cargo.toml)
+- `tauri` ^2.9.x
+- `tauri-plugin-sql` ^2.3.x (with `sqlite` feature)
+- `tauri-plugin-log` ^2.7.x
+- `serde` / `serde_json`
+
+## Running the App
+
+```bash
+# Web mode (development)
+bun dev
+
+# Tauri desktop mode
+bun tauri:dev
+
+# Build for production
+bun tauri build
+```
