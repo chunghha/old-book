@@ -156,8 +156,8 @@
 }
 
 /* --- LANDING PAGE / OVERVIEW SHIMS --- */
-.theme-cde .bg-gradient-to-b,
-.theme-cde .bg-gradient-to-r {
+.theme-cde .bg-linear-to-b,
+.theme-cde .bg-linear-to-r {
   background: none !important;
 }
 

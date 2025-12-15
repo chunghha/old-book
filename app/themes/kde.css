@@ -99,8 +99,8 @@
 }
 
 /* --- LANDING PAGE / OVERVIEW SHIMS --- */
-.theme-kde .bg-gradient-to-b,
-.theme-kde .bg-gradient-to-r {
+.theme-kde .bg-linear-to-b,
+.theme-kde .bg-linear-to-r {
   background: none !important;
 }
 

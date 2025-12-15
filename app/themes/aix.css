@@ -179,8 +179,8 @@
 }
 
 /* --- LANDING PAGE / OVERVIEW SHIMS --- */
-.theme-aix .bg-gradient-to-b,
-.theme-aix .bg-gradient-to-r {
+.theme-aix .bg-linear-to-b,
+.theme-aix .bg-linear-to-r {
   background: none !important;
 }
 
