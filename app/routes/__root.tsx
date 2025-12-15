@@ -64,16 +64,26 @@ function AppShell({ children }: { children?: React.ReactNode }) {
 
 /* ------------------------- Window Chromes -------------------------- */
 
+/*
+   NOTE: 'data-tauri-drag-region' is added to title bars.
+   This allows the user to drag the frameless window around the screen.
+*/
+
 function CDEWindow({ children }: { children: React.ReactNode }) {
   return (
     <div className="window cde-raised flex flex-col !w-[1400px] !h-[900px] max-w-full max-h-full shadow-2xl">
-      <div className="title-bar select-none cursor-default shrink-0">
+      <div
+        className="title-bar select-none cursor-default shrink-0"
+        data-tauri-drag-region
+      >
         <div className="window-controls">
           <div className="win-btn">
             <Minus size={10} strokeWidth={4} />
           </div>
         </div>
-        <div className="window-title">Acme Inc - Book Keeper</div>
+        <div className="window-title pointer-events-none">
+          Acme Inc - Book Keeper
+        </div>
         <div className="window-controls">
           <div className="win-btn">
             <Square size={8} fill="currentColor" />
@@ -93,9 +103,11 @@ function CDEWindow({ children }: { children: React.ReactNode }) {
 function BeOSWindow({ children }: { children: React.ReactNode }) {
   return (
     <div className="window-container flex flex-col !w-[1400px] !h-[900px] max-w-full max-h-full filter drop-shadow-lg">
-      <div className="window-tab select-none shrink-0">
+      <div className="window-tab select-none shrink-0" data-tauri-drag-region>
         <div className="tab-close" />
-        <div className="window-title">Acme Inc : Book Keeper</div>
+        <div className="window-title pointer-events-none">
+          Acme Inc : Book Keeper
+        </div>
       </div>
       <div className="window-frame flex-1 overflow-hidden flex flex-col">
         {children}
@@ -108,11 +120,13 @@ function BeOSWindow({ children }: { children: React.ReactNode }) {
 function AIXWindow({ children }: { children: React.ReactNode }) {
   return (
     <div className="mwm-window !w-[1400px] !h-[900px] max-w-full max-h-full flex flex-col">
-      <div className="title-bar select-none shrink-0">
+      <div className="title-bar select-none shrink-0" data-tauri-drag-region>
         <div className="mwm-btn ml-[2px]">
           <div className="icon-menu" />
         </div>
-        <div className="title-text flex-1">acme_inc : book_keeper</div>
+        <div className="title-text flex-1 pointer-events-none">
+          acme_inc : book_keeper
+        </div>
         <div className="flex gap-[2px] mr-[2px]">
           <div className="mwm-btn">
             <div className="icon-min" />
@@ -132,8 +146,8 @@ function AIXWindow({ children }: { children: React.ReactNode }) {
 function KDEWindow({ children }: { children: React.ReactNode }) {
   return (
     <div className="kwin-window !w-[1400px] !h-[900px] max-w-full max-h-full flex flex-col">
-      <div className="title-bar select-none shrink-0">
-        <div className="flex items-center gap-2">
+      <div className="title-bar select-none shrink-0" data-tauri-drag-region>
+        <div className="flex items-center gap-2 pointer-events-none">
           <div className="window-icon" />
           <div className="window-title">Acme Inc - Book Keeper</div>
         </div>
@@ -166,7 +180,6 @@ function Header() {
   return (
     <header className="border-b shrink-0 z-10 p-3 flex items-center justify-between gap-4 transition-colors bg-inherit">
       <div className="flex items-center gap-3">
-        {/* Replaced broken img with Wallet icon */}
         <Wallet className="w-8 h-8" />
         <div>
           <h1 className="text-lg font-bold tracking-tight leading-tight">
