@@ -41,17 +41,17 @@
 
 /* --- GRAPH & PANEL OVERRIDES --- */
 
-/* KDE Panels (Light, rounded) */
+/* KDE Panels (Light, rectangular) */
 .theme-kde .panel-container {
-  background: #fbfbfb !important;
+  background: var(--kde-surface) !important;
   border: 1px solid #a0a0a0 !important;
-  border-radius: 3px !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06) !important;
 }
 
-/* Chart Frame (White) */
+/* Chart Frame (Surface) */
 .theme-kde .chart-frame {
-  background: #fff !important;
+  background: var(--kde-surface) !important;
   border: 1px solid #dcdcdc !important;
   border-radius: 0 !important;
 }
@@ -70,7 +70,7 @@
 /* Category Bars */
 .theme-kde .cat-bar-container {
   border: 1px solid #ccc !important;
-  border-radius: 3px !important;
+  border-radius: 0 !important;
 }
 
 /* --- BUTTON OVERRIDES --- */
@@ -106,7 +106,7 @@
 
 .theme-kde .bg-slate-800\/50,
 .theme-kde .backdrop-blur-sm {
-  background: #fff !important;
+  background: var(--kde-surface) !important;
   border: 1px solid #ccc !important;
   border-radius: 4px !important;
   backdrop-filter: none !important;
@@ -130,10 +130,61 @@
 }
 
 .theme-kde .bg-slate-800,
-.theme-kde .bg-slate-900 {
-  background: #fff !important;
+.theme-kde .bg-slate-900,
+.theme-kde .bg-white {
+  background: var(--kde-surface) !important;
   border: 1px solid #aaa;
-  color: #222 !important;
+  color: var(--kde-text) !important;
+  border-radius: 0 !important;
+}
+
+/* Theme-aware hover/active utilities
+   Map common Tailwind hover/bg-white and hover/bg-black utilities to KDE surface
+   so components that still use those utilities will get a consistent look. */
+.theme-kde .hover\:bg-white\/5:hover,
+.theme-kde .hover\:bg-black\/5:hover,
+.theme-kde .dark\:hover\:bg-white\/5:hover {
+  /* subtle darkening overlay to emulate hover on KDE surfaces */
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Slightly stronger background for 10% opacity classes */
+.theme-kde .bg-black\/10,
+.theme-kde .bg-white\/10,
+.theme-kde .dark\:bg-white\/10 {
+  background: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Ensure active/pressed states map sensibly too */
+.theme-kde .active\:bg-white\/5,
+.theme-kde .active\:bg-black\/5 {
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Semantic card utility for components to use instead of raw bg-white.
+   Keeps a single place to adjust card surface, border and shadow per theme. */
+.theme-kde .card {
+  background: var(--kde-surface) !important;
+  border: 1px solid #aaa !important;
+  color: var(--kde-text) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+  padding: 1rem !important;
+}
+
+/* Prevent hover styles from affecting modal/fixed-overlay cards.
+   Modals live inside a fixed overlay — restore the baseline background and
+   box-shadow for those `.card` panels so they don't change appearance on hover. */
+.theme-kde .fixed .card,
+.theme-kde .fixed > .card {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+  background: var(--kde-surface) !important;
+}
+.theme-kde .fixed .card:hover,
+.theme-kde .fixed > .card:hover {
+  /* Keep the same non-elevated look on hover for modal cards */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+  background: var(--kde-surface) !important;
 }
 
 .theme-kde header,

@@ -3,6 +3,7 @@
 .theme-beos {
   --beos-desktop: #336698;
   --beos-grey: #d8d8d8;
+  --beos-surface: var(--beos-grey);
   --beos-yellow: #ffcc00;
   --beos-light: #ffffff;
   --beos-shadow: #999999;
@@ -71,22 +72,26 @@
 
 /* BeOS Panels */
 .theme-beos .panel-container {
-  background: var(--beos-grey) !important;
+  background: var(--beos-surface) !important;
   border-top: 1px solid var(--beos-light) !important;
   border-left: 1px solid var(--beos-light) !important;
   border-right: 1px solid var(--beos-dark-shadow) !important;
   border-bottom: 1px solid var(--beos-dark-shadow) !important;
   border-radius: 0 !important;
+  /* Keep classic rectangular panels but provide a subtle theme-appropriate shadow */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06) !important;
 }
 
-/* Chart Frame (White background common in BeOS apps) */
+/* Chart Frame (Surface) */
 .theme-beos .chart-frame {
-  background: #fff !important;
+  background: var(--beos-surface) !important;
   border-top: 1px solid var(--beos-dark-shadow) !important;
   border-left: 1px solid var(--beos-dark-shadow) !important;
   border-right: 1px solid var(--beos-light) !important;
   border-bottom: 1px solid var(--beos-light) !important;
   border-radius: 0 !important;
+  /* subtle inset to give charts a tactile, old-style panel feel while remaining rectangular */
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.06) !important;
 }
 
 .theme-beos .grid-line {
@@ -184,10 +189,78 @@
 }
 
 .theme-beos .bg-slate-800,
-.theme-beos .bg-slate-900 {
-  background: #fff !important;
+.theme-beos .bg-slate-900,
+.theme-beos .bg-white {
+  background: var(--beos-surface) !important;
   border: 1px solid #999;
-  color: #000 !important;
+  color: var(--beos-text) !important;
+}
+
+/* Theme-aware hover/active utilities for BeOS
+   Map common Tailwind hover/bg-white and hover/bg-black utilities
+   so components that still use those utilities will get a consistent look. */
+.theme-beos .hover\:bg-white\/5:hover,
+.theme-beos .hover\:bg-black\/5:hover,
+.theme-beos .dark\:hover\:bg-white\/5:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Slight mappings for 10% opacity classes */
+.theme-beos .bg-black\/10,
+.theme-beos .bg-white\/10,
+.theme-beos .dark\:bg-white\/10 {
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Ensure active/pressed states map sensibly too */
+.theme-beos .active\:bg-white\/5,
+.theme-beos .active\:bg-black\/5 {
+  background: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Simple row-hover helper used by tables/lists */
+.theme-beos .row-hover:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Semantic card utility for components to use instead of raw bg-white.
+   Keeps a single place to adjust card surface, border and shadow per theme. */
+.theme-beos .card {
+  background: var(--beos-surface) !important;
+  border: 1px solid #999 !important;
+  color: var(--beos-text) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+  padding: 1rem !important;
+  transition:
+    box-shadow 120ms ease,
+    background-color 120ms ease !important;
+}
+
+/* Subtle hover elevation to give tactile feedback on cards */
+.theme-beos .card:hover {
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.08) !important;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.02),
+    rgba(0, 0, 0, 0.01)
+  ) !important;
+}
+
+/* Prevent hover styles from affecting modal/fixed-overlay cards.
+   Modals use a fixed overlay containing a `.card` — restore the baseline
+   background and box-shadow for those so they don't appear transparent on hover. */
+.theme-beos .fixed .card,
+.theme-beos .fixed > .card {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+  background: var(--beos-surface) !important;
+}
+
+.theme-beos .fixed .card:hover,
+.theme-beos .fixed > .card:hover {
+  /* Keep the same non-elevated look on hover for modal cards */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+  background: var(--beos-surface) !important;
 }
 
 .theme-beos header,

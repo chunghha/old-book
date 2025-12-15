@@ -109,6 +109,51 @@ function getDaysRemaining(period: BudgetPeriod): number {
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 }
 
+/**
+ * Small runtime-only DOM toast used in development to notify test-data import.
+ * Uses direct DOM APIs so it can be called from non-React code (stores).
+ */
+function showDevToast(message: string, duration = 4000) {
+  if (typeof window === "undefined" || !document?.body) return;
+  try {
+    const id = `bk-dev-toast-${Date.now()}`;
+    const container = document.createElement("div");
+    container.id = id;
+    // Basic styling similar to app toasts (keeps it self-contained)
+    container.style.position = "fixed";
+    container.style.right = "16px";
+    container.style.bottom = "16px";
+    container.style.zIndex = "9999";
+    container.style.background = "rgba(17,24,39,0.95)";
+    container.style.color = "#fff";
+    container.style.padding = "10px 14px";
+    container.style.borderRadius = "8px";
+    container.style.boxShadow = "0 10px 30px rgba(2,6,23,0.6)";
+    container.style.fontSize = "14px";
+    container.style.maxWidth = "320px";
+    container.style.pointerEvents = "auto";
+    container.style.lineHeight = "1.2";
+    container.textContent = message;
+
+    document.body.appendChild(container);
+
+    // Fade out after duration
+    setTimeout(() => {
+      try {
+        container.style.transition = "opacity 220ms ease";
+        container.style.opacity = "0";
+        setTimeout(() => {
+          if (container.parentNode) container.parentNode.removeChild(container);
+        }, 220);
+      } catch {
+        if (container.parentNode) container.parentNode.removeChild(container);
+      }
+    }, duration);
+  } catch {
+    // swallow any errors - this is a best-effort dev notification
+  }
+}
+
 interface FinanceState {
   // Data
   accounts: Account[];
@@ -189,7 +234,40 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
     set({ isLoadingAccounts: true });
     try {
       const db = await getDatabase();
-      const accounts = await db.getAllAccounts();
+      let accounts = await db.getAllAccounts();
+
+      // In development, if no accounts exist yet, auto-import test data from /test-data/accounts.json
+      const isDev =
+        typeof window !== "undefined" &&
+        ((typeof import.meta !== "undefined" &&
+          (import.meta as any).env &&
+          (import.meta as any).env.DEV) ||
+          process.env.NODE_ENV === "development");
+
+      if (accounts.length === 0 && isDev) {
+        try {
+          const resp = await fetch("/test-data/accounts.json");
+          if (resp.ok) {
+            const data = await resp.json();
+            // Use the store import helper to normalize and persist accounts
+            await get().importAccounts(data);
+            accounts = await db.getAllAccounts();
+            console.info(
+              `Imported ${Array.isArray(data) ? data.length : 0} test accounts`,
+            );
+            try {
+              showDevToast(
+                `Imported ${Array.isArray(data) ? data.length : 0} test accounts`,
+              );
+            } catch (e) {
+              /* ignore dev-toast errors */
+            }
+          }
+        } catch (e) {
+          console.warn("Failed to auto-import test accounts:", e);
+        }
+      }
+
       set({ accounts, isLoadingAccounts: false });
     } catch (err) {
       console.error("Failed to load accounts", err);
@@ -240,7 +318,39 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
     set({ isLoadingBudgets: true });
     try {
       const db = await getDatabase();
-      const budgets = await db.getAllBudgets();
+      let budgets = await db.getAllBudgets();
+
+      // In development, if no budgets exist yet, auto-import test data from /test-data/budgets.json
+      const isDev =
+        typeof window !== "undefined" &&
+        ((typeof import.meta !== "undefined" &&
+          (import.meta as any).env &&
+          (import.meta as any).env.DEV) ||
+          process.env.NODE_ENV === "development");
+
+      if (budgets.length === 0 && isDev) {
+        try {
+          const resp = await fetch("/test-data/budgets.json");
+          if (resp.ok) {
+            const data = await resp.json();
+            await get().importBudgets(data);
+            budgets = await db.getAllBudgets();
+            console.info(
+              `Imported ${Array.isArray(data) ? data.length : 0} test budgets`,
+            );
+            try {
+              showDevToast(
+                `Imported ${Array.isArray(data) ? data.length : 0} test budgets`,
+              );
+            } catch (e) {
+              /* ignore dev-toast errors */
+            }
+          }
+        } catch (e) {
+          console.warn("Failed to auto-import test budgets:", e);
+        }
+      }
+
       set({ budgets, isLoadingBudgets: false });
     } catch (err) {
       console.error("Failed to load budgets", err);
@@ -284,9 +394,7 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
 
   updateBudgetSpending: async (category, amount) => {
     const budgets = get().budgets;
-    const budget = budgets.find(
-      (b) => b.category === category && b.isActive,
-    );
+    const budget = budgets.find((b) => b.category === category && b.isActive);
 
     if (budget) {
       const db = await getDatabase();
@@ -326,7 +434,39 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
     set({ isLoadingRecurring: true });
     try {
       const db = await getDatabase();
-      const recurring = await db.getAllRecurring();
+      let recurring = await db.getAllRecurring();
+
+      // In development, if no recurring items exist yet, auto-import test data from /test-data/recurring.json
+      const isDev =
+        typeof window !== "undefined" &&
+        ((typeof import.meta !== "undefined" &&
+          (import.meta as any).env &&
+          (import.meta as any).env.DEV) ||
+          process.env.NODE_ENV === "development");
+
+      if (recurring.length === 0 && isDev) {
+        try {
+          const resp = await fetch("/test-data/recurring.json");
+          if (resp.ok) {
+            const data = await resp.json();
+            await get().importRecurring(data);
+            recurring = await db.getAllRecurring();
+            console.info(
+              `Imported ${Array.isArray(data) ? data.length : 0} test recurring items`,
+            );
+            try {
+              showDevToast(
+                `Imported ${Array.isArray(data) ? data.length : 0} test recurring items`,
+              );
+            } catch (e) {
+              /* ignore dev-toast errors */
+            }
+          }
+        } catch (e) {
+          console.warn("Failed to auto-import test recurring items:", e);
+        }
+      }
+
       set({ recurring, isLoadingRecurring: false });
     } catch (err) {
       console.error("Failed to load recurring transactions", err);
@@ -533,9 +673,7 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
   },
 
   getUpcomingRecurring: (days = 7) => {
-    const recurring = get().recurring.filter(
-      (r) => r.isActive && r.nextDue,
-    );
+    const recurring = get().recurring.filter((r) => r.isActive && r.nextDue);
     const now = new Date();
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() + days);
@@ -563,9 +701,7 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
   },
 
   getOverdueBudgets: () => {
-    return get().budgets.filter(
-      (b) => b.isActive && b.spent > b.amount,
-    );
+    return get().budgets.filter((b) => b.isActive && b.spent > b.amount);
   },
 
   getActiveAccounts: () => {

@@ -1,4 +1,5 @@
 import React from "react";
+import { Outlet, Link } from "@tanstack/react-router";
 import {
   Sun,
   Moon,
@@ -12,21 +13,22 @@ import {
   TrendingUp,
   BarChart3,
   Building2,
-  Briefcase,
   PiggyBank,
   Receipt,
-  CheckSquare,
   Search,
 } from "lucide-react";
 import { ThemeProvider, useTheme } from "../themes";
 import { minimizeWindow, toggleMaximize, closeWindow } from "../lib/window";
+import { ToastProvider } from "../components/toast/Toast";
 
 export default Root;
 
-function Root({ children }: { children?: React.ReactNode }) {
+function Root() {
   return (
     <ThemeProvider>
-      <AppShell>{children}</AppShell>
+      <ToastProvider>
+        <AppShell />
+      </ToastProvider>
     </ThemeProvider>
   );
 }
@@ -45,7 +47,7 @@ function AppShell({ children }: { children?: React.ReactNode }) {
       <div className="flex flex-1 min-h-0">
         <Sidebar />
         <main className="flex-1 p-6 overflow-y-auto">
-          <div className="w-full h-full">{children}</div>
+          <div className="w-full h-full"><Outlet /></div>
         </main>
       </div>
       <Footer />
@@ -82,7 +84,7 @@ function AppShell({ children }: { children?: React.ReactNode }) {
 
 function CDEWindow({ children }: { children: React.ReactNode }) {
   return (
-    <div className="window cde-raised flex flex-col !w-[1400px] !h-[900px] max-w-full max-h-full shadow-2xl">
+    <div className="window cde-raised flex flex-col w-350! h-225! max-w-full max-h-full shadow-2xl">
       <div
         className="title-bar select-none cursor-default shrink-0"
         data-tauri-drag-region
@@ -126,7 +128,7 @@ function CDEWindow({ children }: { children: React.ReactNode }) {
 
 function BeOSWindow({ children }: { children: React.ReactNode }) {
   return (
-    <div className="window-container flex flex-col !w-[1400px] !h-[900px] max-w-full max-h-full filter drop-shadow-lg">
+    <div className="window-container flex flex-col w-350! h-225! max-w-full max-h-full filter drop-shadow-lg">
       <div className="window-tab select-none shrink-0" data-tauri-drag-region>
         <button
           type="button"
@@ -174,18 +176,18 @@ function BeOSWindow({ children }: { children: React.ReactNode }) {
 
 function AIXWindow({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mwm-window !w-[1400px] !h-[900px] max-w-full max-h-full flex flex-col">
+    <div className="mwm-window w-350! h-225! max-w-full max-h-full flex flex-col">
       <div className="title-bar select-none shrink-0" data-tauri-drag-region>
         <button
           type="button"
-          className="mwm-btn ml-[2px]"
+          className="mwm-btn ml-0.5"
           onClick={closeWindow}
           title="Close"
         >
           <div className="icon-menu" />
         </button>
         <div className="title-text flex-1 pointer-events-none">book_keeper</div>
-        <div className="flex gap-[2px] mr-[2px]">
+        <div className="flex gap-0.5 mr-0.5">
           <button
             type="button"
             className="mwm-btn"
@@ -213,7 +215,7 @@ function AIXWindow({ children }: { children: React.ReactNode }) {
 
 function KDEWindow({ children }: { children: React.ReactNode }) {
   return (
-    <div className="kwin-window !w-[1400px] !h-[900px] max-w-full max-h-full flex flex-col">
+    <div className="kwin-window w-350! h-225! max-w-full max-h-full flex flex-col">
       <div className="title-bar select-none shrink-0" data-tauri-drag-region>
         <div className="flex items-center gap-2 pointer-events-none">
           <div className="window-icon" />
@@ -326,13 +328,7 @@ function Sidebar() {
               Dashboard
             </SidebarLink>
             <SidebarLink to="/transactions" icon={<FileText size={14} />}>
-              Transaction
-            </SidebarLink>
-            <SidebarLink to="/cash-flow" icon={<TrendingUp size={14} />}>
-              Cash Flow
-            </SidebarLink>
-            <SidebarLink to="/analytics" icon={<BarChart3 size={14} />}>
-              Analytics
+              Transactions
             </SidebarLink>
           </div>
         </div>
@@ -343,32 +339,29 @@ function Sidebar() {
             Money
           </div>
           <div className="flex flex-col gap-0.5">
-            <SidebarLink
-              to="/accounts/operating"
-              icon={<Building2 size={14} />}
-            >
-              Operating Acct
+            <SidebarLink to="/accounts" icon={<Building2 size={14} />}>
+              Accounts
             </SidebarLink>
-            <SidebarLink to="/accounts/payroll" icon={<Briefcase size={14} />}>
-              Payroll Acct
+            <SidebarLink to="/budgets" icon={<PiggyBank size={14} />}>
+              Budgets
             </SidebarLink>
-            <SidebarLink to="/accounts/savings" icon={<PiggyBank size={14} />}>
-              Savings
+            <SidebarLink to="/recurring" icon={<Receipt size={14} />}>
+              Recurring
             </SidebarLink>
           </div>
         </div>
 
-        {/* WORKFLOWS Section */}
+        {/* ANALYTICS Section */}
         <div>
           <div className="text-[10px] font-bold uppercase tracking-wider opacity-60 mb-1.5 pl-1">
-            Workflows
+            Analytics
           </div>
           <div className="flex flex-col gap-0.5">
-            <SidebarLink to="/bill-pay" icon={<Receipt size={14} />}>
-              Bill Pay
+            <SidebarLink to="/cash-flow" icon={<TrendingUp size={14} />}>
+              Cash Flow
             </SidebarLink>
-            <SidebarLink to="/approvals" icon={<CheckSquare size={14} />}>
-              Approvals
+            <SidebarLink to="/analytics" icon={<BarChart3 size={14} />}>
+              Reports
             </SidebarLink>
           </div>
         </div>
@@ -393,24 +386,6 @@ function Footer() {
   );
 }
 
-function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
-  const isActive =
-    typeof window !== "undefined" && window.location.pathname === to;
-  return (
-    <a
-      href={to}
-      onClick={(e) => handleNav(e, to)}
-      className={`px-3 py-1.5 rounded text-sm transition-colors ${
-        isActive
-          ? "font-bold underline opacity-100"
-          : "opacity-80 hover:opacity-100 hover:underline"
-      }`}
-    >
-      {children}
-    </a>
-  );
-}
-
 function SidebarLink({
   to,
   icon,
@@ -420,28 +395,16 @@ function SidebarLink({
   icon: React.ReactNode;
   children: React.ReactNode;
 }) {
-  const isActive =
-    typeof window !== "undefined" && window.location.pathname === to;
   return (
-    <a
-      href={to}
-      onClick={(e) => handleNav(e, to)}
-      className={`flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-colors ${
-        isActive
-          ? "bg-black/10 dark:bg-white/10 font-semibold"
-          : "hover:bg-black/5 dark:hover:bg-white/5"
-      }`}
+    <Link
+      to={to}
+      className="flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+      activeProps={{
+        className: "bg-black/10 dark:bg-white/10 font-semibold",
+      }}
     >
       {icon}
       {children}
-    </a>
+    </Link>
   );
-}
-
-function handleNav(e: React.MouseEvent, to: string) {
-  if (to.startsWith("/")) {
-    e.preventDefault();
-    window.history.pushState({}, "", to);
-    window.dispatchEvent(new PopStateEvent("popstate"));
-  }
 }

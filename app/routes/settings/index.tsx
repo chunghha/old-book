@@ -1,6 +1,7 @@
 import React, { useState, ChangeEvent } from "react";
 import { useTheme } from "../../themes";
 import useTransactionsStore from "../../stores/transactions";
+import { importFromFile, exportToFile, parseCSV } from "../../lib/file-dialogs";
 
 function SettingsRoute() {
   const { theme, setTheme } = useTheme();
@@ -38,33 +39,71 @@ function SettingsRoute() {
     setImportResult(null);
   }
 
-  function handleFileImport(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
+  async function handleFileImport(e?: ChangeEvent<HTMLInputElement>) {
     setIsImporting(true);
 
-    // FileReader is callback-based, so we wrap the async call inside
-    reader.onload = async () => {
-      try {
-        const text = String(reader.result ?? "");
-        // Await the async import from the store
+    try {
+      // If invoked from a file input change event (web), keep backward-compatible behavior
+      if (e && e.target && e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        const text: string = await new Promise((resolve, reject) => {
+          reader.onload = () => resolve(String(reader.result ?? ""));
+          reader.onerror = () => reject(new Error("Failed to read file"));
+          reader.readAsText(file);
+        });
+
         const res = await importJSON(text);
         setImportResult(`Imported ${res.added} item(s).`);
-      } catch (err) {
-        setImportResult(
-          "Failed to import file. Ensure it's a JSON array of transactions.",
-        );
-      } finally {
-        setIsImporting(false);
+        e.currentTarget.value = "";
+        return;
       }
-    };
-    reader.onerror = () => {
-      setImportResult("Failed to read file.");
+
+      // Otherwise open native file dialog (Tauri) or web fallback via importFromFile()
+      const res = await importFromFile();
+      if (!res) {
+        // user cancelled
+        setImportResult(null);
+        return;
+      }
+
+      // If result is a raw string: try CSV first, then JSON text
+      if (typeof res.data === "string") {
+        // try CSV -> convert to objects -> import
+        try {
+          const parsed = parseCSV(res.data);
+          const r = await importJSON(JSON.stringify(parsed));
+          setImportResult(`Imported ${r.added} transaction(s) from CSV.`);
+          return;
+        } catch {
+          // if CSV parsing fails, try JSON parsing
+          try {
+            const r = await importJSON(res.data as string);
+            setImportResult(`Imported ${r.added} transaction(s).`);
+            return;
+          } catch {
+            setImportResult(
+              "Failed to import file. Unsupported or invalid format.",
+            );
+            return;
+          }
+        }
+      }
+
+      // If structured data (objects) returned, stringify and import
+      try {
+        const r = await importJSON(JSON.stringify(res.data));
+        setImportResult(`Imported ${r.added} transaction(s).`);
+        return;
+      } catch {
+        setImportResult("Failed to import file. Invalid structured data.");
+        return;
+      }
+    } catch {
+      setImportResult("Failed to import file.");
+    } finally {
       setIsImporting(false);
-    };
-    reader.readAsText(file);
-    e.currentTarget.value = "";
+    }
   }
 
   async function handlePasteImport() {
@@ -83,22 +122,61 @@ function SettingsRoute() {
     }
   }
 
-  function handleExportJSON() {
-    const content = exportJSON();
-    download(
-      `book-keeper-backup-${new Date().toISOString().slice(0, 10)}.json`,
-      content,
-      "application/json",
-    );
+  async function handleExportJSON() {
+    // Try native save dialog first, fall back to download
+    try {
+      const content = exportJSON();
+      const data = JSON.parse(content);
+      const ok = await exportToFile(data, {
+        title: "Export Backup (JSON)",
+        defaultFilename: `book-keeper-backup-${new Date()
+          .toISOString()
+          .slice(0, 10)}.json`,
+        format: "json",
+      }).catch(() => false);
+      if (!ok) {
+        download(
+          `book-keeper-backup-${new Date().toISOString().slice(0, 10)}.json`,
+          content,
+          "application/json",
+        );
+      }
+    } catch {
+      // If something goes wrong, fallback to original download method
+      const content = exportJSON();
+      download(
+        `book-keeper-backup-${new Date().toISOString().slice(0, 10)}.json`,
+        content,
+        "application/json",
+      );
+    }
   }
 
-  function handleExportCSV() {
-    const content = exportCSV();
-    download(
-      `book-keeper-backup-${new Date().toISOString().slice(0, 10)}.csv`,
-      content,
-      "text/csv",
-    );
+  async function handleExportCSV() {
+    try {
+      const content = exportCSV();
+      const ok = await exportToFile(content, {
+        title: "Export Backup (CSV)",
+        defaultFilename: `book-keeper-backup-${new Date()
+          .toISOString()
+          .slice(0, 10)}.csv`,
+        format: "csv",
+      }).catch(() => false);
+      if (!ok) {
+        download(
+          `book-keeper-backup-${new Date().toISOString().slice(0, 10)}.csv`,
+          content,
+          "text/csv",
+        );
+      }
+    } catch {
+      const content = exportCSV();
+      download(
+        `book-keeper-backup-${new Date().toISOString().slice(0, 10)}.csv`,
+        content,
+        "text/csv",
+      );
+    }
   }
 
   async function handleClearAll() {
@@ -117,7 +195,7 @@ function SettingsRoute() {
       </header>
 
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+        <div className="card panel-container p-4 space-y-3">
           <h3 className="font-bold">Theme</h3>
           <p className="text-sm opacity-70">
             Choose a visual theme for the app. The selection is persisted to
@@ -128,7 +206,7 @@ function SettingsRoute() {
             {themes.map((t) => (
               <label
                 key={t.key}
-                className="flex items-center gap-3 px-3 py-2 rounded hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
+                className="flex items-center gap-3 px-3 py-2 rounded hover:bg-black/5 dark:hover:bg-slate-800/10 cursor-pointer"
               >
                 <input
                   type="radio"
@@ -148,7 +226,7 @@ function SettingsRoute() {
           </div>
         </div>
 
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+        <div className="card panel-container p-4 space-y-3">
           <h3 className="font-bold">Data Import / Export</h3>
           <p className="text-sm opacity-70">
             Import transactions from a JSON file or paste a JSON array. You can
@@ -161,8 +239,8 @@ function SettingsRoute() {
                 Choose file
                 <input
                   type="file"
-                  accept=".json,.txt"
-                  onChange={handleFileImport}
+                  accept=".json,.txt,.csv"
+                  onChange={(e) => handleFileImport(e)}
                   className="sr-only"
                 />
               </label>

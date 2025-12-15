@@ -74,17 +74,19 @@
 
 /* Ensure panels look like CDE panels (raised) */
 .theme-cde .panel-container {
-  background: var(--win-bg) !important;
+  background: var(--cde-surface, var(--win-bg)) !important;
   border-top: 2px solid var(--win-light) !important;
   border-left: 2px solid var(--win-light) !important;
   border-right: 2px solid var(--win-shadow) !important;
   border-bottom: 2px solid var(--win-shadow) !important;
   border-radius: 0 !important;
+  /* subtle, theme-appropriate elevation while keeping rectangular (classic) look */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
 }
 
-/* The chart frame should be sunken (inset) and black */
+/* The chart frame should be sunken (inset) - allow theme to control color via variable */
 .theme-cde .chart-frame {
-  background: #000 !important;
+  background: var(--cde-chart-bg, #000) !important;
   border-top: 2px solid var(--win-shadow) !important;
   border-left: 2px solid var(--win-shadow) !important;
   border-right: 2px solid var(--win-light) !important;
@@ -193,11 +195,77 @@
 }
 
 .theme-cde .bg-slate-800,
-.theme-cde .bg-slate-900 {
+.theme-cde .bg-slate-900,
+.theme-cde .bg-white {
   background: var(--cde-surface) !important;
   border: 1px solid var(--cde-border);
-  color: #222 !important;
-  box-shadow: inset 1px 1px 0 #fff;
+  color: var(--cde-text) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* Semantic card utility for components to use instead of raw bg-white.
+   Keeps a single place to adjust card surface, border and shadow per theme. */
+.theme-cde .card {
+  background: var(--cde-surface) !important;
+  border: 1px solid var(--cde-border) !important;
+  color: var(--cde-text) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+  padding: 1rem !important;
+  transition:
+    box-shadow 120ms ease,
+    background-color 120ms ease !important;
+}
+
+/* Theme-aware hover/active utilities so components that still use Tailwind hover/bg classes
+   get a consistent CDE look and don't rely on raw bg-white/dark variants. */
+.theme-cde .hover\:bg-white\/5:hover,
+.theme-cde .hover\:bg-black\/5:hover,
+.theme-cde .dark\:hover\:bg-white\/5:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Slight mappings for 10% opacity helper classes */
+.theme-cde .bg-black\/10,
+.theme-cde .bg-white\/10,
+.theme-cde .dark\:bg-white\/10 {
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Active/pressed mappings */
+.theme-cde .active\:bg-white\/5,
+.theme-cde .active\:bg-black\/5 {
+  background: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Simple helper for table/list row hover used in components */
+.theme-cde .row-hover:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Subtle hover elevation for CDE cards */
+.theme-cde .card:hover {
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.08) !important;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.02),
+    rgba(0, 0, 0, 0.01)
+  ) !important;
+}
+
+/* Prevent hover styles from affecting modal/fixed-overlay cards.
+   Modals use a fixed overlay containing a `.card` — restore the baseline
+   background and box-shadow for those so they don't appear transparent on hover. */
+.theme-cde .fixed .card,
+.theme-cde .fixed > .card {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+  background: var(--cde-surface) !important;
+}
+.theme-cde .fixed .card:hover,
+.theme-cde .fixed > .card:hover {
+  /* Keep the same non-elevated look on hover for modal cards */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+  background: var(--cde-surface) !important;
 }
 
 .theme-cde header,

@@ -4,7 +4,7 @@ A local-first personal finance application built with **React**, **Tailwind CSS 
 
 It features a unique "Desktop Environment" theming engine that accurately recreates the look and feel of classic operating systems, rendering the entire application window inside a themed desktop layer.
 
-## 🎨 Themes
+## Themes
 
 The app includes four pixel-perfect retro themes:
 
@@ -13,7 +13,17 @@ The app includes four pixel-perfect retro themes:
 3. **AIX (Motif):** Industrial grey, sharp edges, and Helvetica fonts.
 4. **KDE 3 (Plastic):** Early 2000s gradients, soft blue/grey palette, and Tahoma fonts.
 
-## 🛠️ Tech Stack
+## Screenshots
+
+A 2×2 preview of the four included retro themes. Images are shown at original size from the `screenshots/` folder.
+
+| CDE | BeOS |
+| --- | --- |
+| ![CDE theme](screenshots/cde.png) | ![BeOS theme](screenshots/beos.png) |
+| AIX | KDE 3 |
+| ![AIX theme](screenshots/aix.png) | ![KDE theme](screenshots/kde.png) |
+
+## Tech Stack
 
 | Layer | Technology |
 |-------|------------|
@@ -26,7 +36,7 @@ The app includes four pixel-perfect retro themes:
 | **Icons** | Lucide React |
 | **Linting** | Biome (TS/JS), Clippy (Rust) |
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -51,7 +61,7 @@ bun tauri:dev
 
 Open http://localhost:5174 in your browser for web mode.
 
-## 📜 Available Scripts
+## Available Scripts
 
 ### Build & Quality
 
@@ -85,7 +95,7 @@ Open http://localhost:5174 in your browser for web mode.
 | `bun run tauri` | Run Tauri CLI commands |
 | `bun run tauri:dev` | Start Tauri development mode |
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 project/
@@ -122,7 +132,7 @@ project/
 └── package.json
 ```
 
-## ✨ Features
+## Features
 
 ### Implemented
 
@@ -154,7 +164,7 @@ project/
 | Receipt | Attached, Missing, N/A |
 | Status | Done, Pending, Review |
 
-## 🗄️ Database Schema
+## Database Schema
 
 ```sql
 CREATE TABLE transactions (
@@ -175,20 +185,20 @@ CREATE TABLE transactions (
 );
 ```
 
-## 🧪 Test Data
+## Test Data
 
 Sample data files are provided in `test-data/` for testing:
 
 | File | Description |
 |------|-------------|
-| `transactions.json` | 60 sample transactions (Jan-Mar 2024) |
+| `transactions.json` | 60 sample transactions (Jan-Mar 2025) |
 | `accounts.json` | 7 sample accounts (checking, savings, credit, investment) |
 | `budgets.json` | 15 budget categories with spending data |
 | `recurring.json` | 20 recurring transactions (subscriptions, bills, salary) |
 
 Import via Settings page or directly in the browser console.
 
-## 🔮 Roadmap
+## Roadmap
 
 - [ ] TanStack Query for data fetching
 - [ ] TanStack Virtual for large transaction lists (10k+ rows)
@@ -199,14 +209,10 @@ Import via Settings page or directly in the browser console.
 - [ ] Recurring transaction automation
 - [ ] Reports and analytics page
 
-## 📦 New Dependencies
+## New Dependencies
 
 | Package | Purpose |
 |---------|---------|
 | `@tanstack/react-form` | Form state management |
 | `@tanstack/react-virtual` | Virtualized lists (installed) |
 | `@tanstack/react-query` | Data fetching (installed, not yet used) |
-
-## 📄 License
-
-MIT

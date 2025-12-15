@@ -25,3 +25,5 @@ export async function getDatabase(): Promise<StorageAdapter> {
 
   return adapterInstance;
 }
+
+export const getAdapter = getDatabase;

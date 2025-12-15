@@ -133,7 +133,7 @@ Sample data files in `test-data/` for development and testing:
 
 | File | Records | Description |
 |------|---------|-------------|
-| `transactions.json` | 60 | Sample transactions (Jan-Mar 2024) |
+| `transactions.json` | 60 | Sample transactions (Jan-Mar 2025) |
 | `accounts.json` | 7 | Checking, savings, credit, investment accounts |
 | `budgets.json` | 15 | Budget categories with spending data |
 | `recurring.json` | 20 | Subscriptions, bills, salary, transfers |

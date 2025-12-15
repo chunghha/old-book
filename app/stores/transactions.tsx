@@ -86,6 +86,50 @@ function genId(prefix = "tx") {
   return `${prefix}_${t}_${r}`;
 }
 
+/**
+ * Small runtime-only DOM toast used in development to notify test-data import.
+ * Uses direct DOM APIs so it can be called from non-React code (stores).
+ */
+function showDevToast(message: string, duration = 4000) {
+  if (typeof window === "undefined" || !document?.body) return;
+  try {
+    const id = `bk-dev-toast-${Date.now()}`;
+    const container = document.createElement("div");
+    container.id = id;
+    container.style.position = "fixed";
+    container.style.right = "16px";
+    container.style.bottom = "16px";
+    container.style.zIndex = "9999";
+    container.style.background = "rgba(17,24,39,0.95)";
+    container.style.color = "#fff";
+    container.style.padding = "10px 14px";
+    container.style.borderRadius = "8px";
+    container.style.boxShadow = "0 10px 30px rgba(2,6,23,0.6)";
+    container.style.fontSize = "14px";
+    container.style.maxWidth = "320px";
+    container.style.pointerEvents = "auto";
+    container.style.lineHeight = "1.2";
+    container.textContent = message;
+
+    document.body.appendChild(container);
+
+    // Fade out after duration
+    setTimeout(() => {
+      try {
+        container.style.transition = "opacity 220ms ease";
+        container.style.opacity = "0";
+        setTimeout(() => {
+          if (container.parentNode) container.parentNode.removeChild(container);
+        }, 220);
+      } catch {
+        if (container.parentNode) container.parentNode.removeChild(container);
+      }
+    }, duration);
+  } catch {
+    // swallow any errors - this is a best-effort dev notification
+  }
+}
+
 /** Category colors for charts */
 const CATEGORY_COLORS = [
   "#22d3ee", // cyan
@@ -199,7 +243,41 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => {
       set({ isLoading: true });
       try {
         const db = await getDatabase();
-        const txs = await db.getAll();
+        let txs = await db.getAll();
+
+        // Detect development mode (Vite / NODE env heuristics)
+        const isDev =
+          typeof window !== "undefined" &&
+          ((typeof import.meta !== "undefined" &&
+            (import.meta as any).env &&
+            (import.meta as any).env.DEV) ||
+            process.env.NODE_ENV === "development");
+
+        // If DB is empty and we're in dev, attempt to auto-import test-data/transactions.json
+        if ((txs.length === 0 || txs.length === undefined) && isDev) {
+          try {
+            const resp = await fetch("/test-data/transactions.json");
+            if (resp.ok) {
+              const data = await resp.json();
+              // import directly to DB using adapter method
+              await db.import(data);
+              txs = await db.getAll();
+              console.info(
+                `Imported ${Array.isArray(data) ? data.length : 0} test transactions`,
+              );
+              try {
+                showDevToast(
+                  `Imported ${Array.isArray(data) ? data.length : 0} test transactions`,
+                );
+              } catch {
+                // ignore toast errors
+              }
+            }
+          } catch (e) {
+            console.warn("Failed to auto-import test transactions:", e);
+          }
+        }
+
         set({ transactions: txs, isLoading: false });
       } catch (err) {
         console.error("Failed to load transactions", err);

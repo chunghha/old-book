@@ -11,8 +11,8 @@
     "color": "#1a73e8",
     "isActive": true,
     "isPrimary": true,
-    "createdAt": "2024-01-01T00:00:00.000Z",
-    "updatedAt": "2024-03-29T12:00:00.000Z"
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-03-29T12:00:00.000Z"
   },
   {
     "id": "acc_002",
@@ -22,13 +22,13 @@
     "institution": "Brex",
     "lastFour": "2502",
     "balance": -1245.32,
-    "creditLimit": 15000.00,
+    "creditLimit": 15000.0,
     "currency": "USD",
     "color": "#f97316",
     "isActive": true,
     "isPrimary": false,
-    "createdAt": "2024-01-01T00:00:00.000Z",
-    "updatedAt": "2024-03-29T12:00:00.000Z"
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-03-29T12:00:00.000Z"
   },
   {
     "id": "acc_003",
@@ -37,14 +37,14 @@
     "type": "savings",
     "institution": "Marcus by Goldman Sachs",
     "lastFour": "8834",
-    "balance": 25000.00,
+    "balance": 25000.0,
     "interestRate": 4.5,
     "currency": "USD",
     "color": "#22c55e",
     "isActive": true,
     "isPrimary": false,
-    "createdAt": "2024-01-01T00:00:00.000Z",
-    "updatedAt": "2024-03-29T12:00:00.000Z"
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-03-29T12:00:00.000Z"
   },
   {
     "id": "acc_004",
@@ -58,8 +58,8 @@
     "color": "#8b5cf6",
     "isActive": true,
     "isPrimary": false,
-    "createdAt": "2024-01-01T00:00:00.000Z",
-    "updatedAt": "2024-03-29T12:00:00.000Z"
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-03-29T12:00:00.000Z"
   },
   {
     "id": "acc_005",
@@ -68,14 +68,14 @@
     "type": "savings",
     "institution": "Ally Bank",
     "lastFour": "3301",
-    "balance": 10000.00,
+    "balance": 10000.0,
     "interestRate": 4.25,
     "currency": "USD",
     "color": "#ef4444",
     "isActive": true,
     "isPrimary": false,
-    "createdAt": "2024-01-15T00:00:00.000Z",
-    "updatedAt": "2024-03-29T12:00:00.000Z"
+    "createdAt": "2025-01-15T00:00:00.000Z",
+    "updatedAt": "2025-03-29T12:00:00.000Z"
   },
   {
     "id": "acc_006",
@@ -84,14 +84,14 @@
     "type": "checking",
     "institution": "Chase Bank",
     "lastFour": "9945",
-    "balance": 0.00,
+    "balance": 0.0,
     "currency": "USD",
     "color": "#06b6d4",
     "isActive": true,
     "isPrimary": false,
     "note": "Business payroll processing",
-    "createdAt": "2024-02-01T00:00:00.000Z",
-    "updatedAt": "2024-03-29T12:00:00.000Z"
+    "createdAt": "2025-02-01T00:00:00.000Z",
+    "updatedAt": "2025-03-29T12:00:00.000Z"
   },
   {
     "id": "acc_007",
@@ -107,6 +107,6 @@
     "isPrimary": false,
     "note": "Closed account - pending transfer",
     "createdAt": "2023-01-01T00:00:00.000Z",
-    "updatedAt": "2024-02-15T12:00:00.000Z"
+    "updatedAt": "2025-02-15T12:00:00.000Z"
   }
 ]
