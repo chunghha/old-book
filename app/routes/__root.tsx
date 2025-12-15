@@ -9,6 +9,14 @@ import {
   Minus,
   Square,
   Wallet,
+  TrendingUp,
+  BarChart3,
+  Building2,
+  Briefcase,
+  PiggyBank,
+  Receipt,
+  CheckSquare,
+  Search,
 } from "lucide-react";
 import { ThemeProvider, useTheme } from "../themes";
 import { minimizeWindow, toggleMaximize, closeWindow } from "../lib/window";
@@ -267,41 +275,28 @@ function Header() {
   };
 
   return (
-    <header className="border-b shrink-0 z-10 p-3 flex items-center justify-between gap-4 transition-colors bg-inherit">
-      <div className="flex items-center gap-3">
-        <Wallet className="w-8 h-8" />
-        <div>
-          <h1 className="text-lg font-bold tracking-tight leading-tight">
-            Book Keeper
-          </h1>
-          <p className="text-xs opacity-70">Local-first finances</p>
-        </div>
+    <header className="border-b shrink-0 z-10 px-3 py-2 flex items-center justify-between gap-4 transition-colors bg-inherit">
+      <div className="flex items-center gap-2">
+        <Wallet className="w-5 h-5 opacity-70" />
+        <span className="text-sm font-semibold">Book Keeper</span>
       </div>
 
-      <div className="flex items-center gap-3">
-        <nav className="hidden md:flex items-center gap-1">
-          <NavLink to="/">Overview</NavLink>
-          <NavLink to="/transactions">Transactions</NavLink>
-          <NavLink to="/settings">Settings</NavLink>
-        </nav>
-
+      <div className="flex items-center gap-2">
         <button
           onClick={cycleTheme}
-          className="flex items-center gap-2 px-3 py-1.5 rounded border text-sm font-medium hover:opacity-80 transition-opacity"
+          className="flex items-center gap-1.5 px-2 py-1 rounded border text-xs font-medium hover:opacity-80 transition-opacity"
           title="Switch Theme"
         >
           {theme === "kde" ? (
-            <Grid size={14} />
+            <Grid size={12} />
           ) : theme === "aix" ? (
-            <Sun size={14} />
+            <Sun size={12} />
           ) : theme === "beos" ? (
-            <Moon size={14} />
+            <Moon size={12} />
           ) : (
-            <Square size={14} />
+            <Square size={12} />
           )}
-          <span className="hidden sm:inline">
-            {themeLabels[theme] || theme}
-          </span>
+          <span>{themeLabels[theme] || theme}</span>
         </button>
       </div>
     </header>
@@ -310,35 +305,85 @@ function Header() {
 
 function Sidebar() {
   return (
-    <aside className="w-56 border-r hidden md:flex flex-col p-4 gap-6 shrink-0 z-0 bg-inherit">
-      <div>
-        <div className="text-xs font-bold uppercase tracking-wider opacity-60 mb-2 pl-1">
-          Navigate
-        </div>
-        <div className="flex flex-col gap-1">
-          <SidebarLink to="/" icon={<Grid size={14} />}>
-            Dashboard
-          </SidebarLink>
-          <SidebarLink to="/transactions" icon={<FileText size={14} />}>
-            Transactions
-          </SidebarLink>
-          <SidebarLink to="/settings" icon={<Settings size={14} />}>
-            Settings
-          </SidebarLink>
+    <aside className="w-48 border-r hidden md:flex flex-col shrink-0 z-0 bg-inherit">
+      {/* Search Box */}
+      <div className="p-3 border-b border-inherit">
+        <div className="relative">
+          <Search
+            size={14}
+            className="absolute left-2 top-1/2 -translate-y-1/2 opacity-50"
+          />
+          <input
+            type="text"
+            placeholder="Search..."
+            className="w-full pl-7 pr-2 py-1.5 text-xs rounded border bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-700"
+          />
         </div>
       </div>
 
-      <div>
-        <div className="text-xs font-bold uppercase tracking-wider opacity-60 mb-2 pl-1">
-          Actions
+      <div className="flex-1 overflow-y-auto p-3 space-y-4">
+        {/* MAIN Section */}
+        <div>
+          <div className="text-[10px] font-bold uppercase tracking-wider opacity-60 mb-1.5 pl-1">
+            Main
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <SidebarLink to="/" icon={<Grid size={14} />}>
+              Dashboard
+            </SidebarLink>
+            <SidebarLink to="/transactions" icon={<FileText size={14} />}>
+              Transaction
+            </SidebarLink>
+            <SidebarLink to="/cash-flow" icon={<TrendingUp size={14} />}>
+              Cash Flow
+            </SidebarLink>
+            <SidebarLink to="/analytics" icon={<BarChart3 size={14} />}>
+              Analytics
+            </SidebarLink>
+          </div>
         </div>
-        <div className="flex flex-col gap-1">
-          <button className="text-left px-3 py-1.5 rounded text-sm hover:underline hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-            + New Entry
-          </button>
-          <button className="text-left px-3 py-1.5 rounded text-sm hover:underline hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-            Import CSV
-          </button>
+
+        {/* MONEY Section */}
+        <div>
+          <div className="text-[10px] font-bold uppercase tracking-wider opacity-60 mb-1.5 pl-1">
+            Money
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <SidebarLink
+              to="/accounts/operating"
+              icon={<Building2 size={14} />}
+            >
+              Operating Acct
+            </SidebarLink>
+            <SidebarLink to="/accounts/payroll" icon={<Briefcase size={14} />}>
+              Payroll Acct
+            </SidebarLink>
+            <SidebarLink to="/accounts/savings" icon={<PiggyBank size={14} />}>
+              Savings
+            </SidebarLink>
+          </div>
+        </div>
+
+        {/* WORKFLOWS Section */}
+        <div>
+          <div className="text-[10px] font-bold uppercase tracking-wider opacity-60 mb-1.5 pl-1">
+            Workflows
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <SidebarLink to="/bill-pay" icon={<Receipt size={14} />}>
+              Bill Pay
+            </SidebarLink>
+            <SidebarLink to="/approvals" icon={<CheckSquare size={14} />}>
+              Approvals
+            </SidebarLink>
+          </div>
+        </div>
+
+        {/* Settings at bottom */}
+        <div className="pt-2 border-t border-inherit">
+          <SidebarLink to="/settings" icon={<Settings size={14} />}>
+            Settings
+          </SidebarLink>
         </div>
       </div>
     </aside>
@@ -387,9 +432,9 @@ function SidebarLink({
     <a
       href={to}
       onClick={(e) => handleNav(e, to)}
-      className={`flex items-center gap-2 px-3 py-2 rounded text-sm transition-colors ${
+      className={`flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-colors ${
         isActive
-          ? "bg-black/5 dark:bg-white/10 font-medium"
+          ? "bg-black/10 dark:bg-white/10 font-semibold"
           : "hover:bg-black/5 dark:hover:bg-white/5"
       }`}
     >

@@ -1,10 +1,32 @@
-import { StorageAdapter, Transaction } from "./types";
+import {
+  StorageAdapter,
+  Transaction,
+  PaymentMethod,
+  ReceiptStatus,
+  TransactionStatus,
+} from "./types";
 
 const STORAGE_KEY = "bk:transactions:v1";
 
 export class LocalStorageAdapter implements StorageAdapter {
   async init(): Promise<void> {
-    // No-op for local storage, data is always "ready"
+    // Migrate old transactions to include new fields
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const txs = JSON.parse(raw) as any[];
+        const migrated = txs.map((tx) => ({
+          ...tx,
+          payee: tx.payee || tx.description || "",
+          method: tx.method || "card",
+          receiptStatus: tx.receiptStatus || "missing",
+          status: tx.status || "pending",
+        }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+      }
+    } catch {
+      // Ignore migration errors
+    }
     return Promise.resolve();
   }
 
@@ -12,7 +34,26 @@ export class LocalStorageAdapter implements StorageAdapter {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return [];
-      return JSON.parse(raw) as Transaction[];
+
+      const parsed = JSON.parse(raw) as any[];
+
+      // Normalize and validate each transaction
+      return parsed.map((item) => ({
+        id: item.id,
+        date: item.date,
+        amount: Number(item.amount),
+        type: item.type as "credit" | "debit",
+        payee: item.payee || undefined,
+        description: item.description || undefined,
+        account: item.account || undefined,
+        category: item.category || undefined,
+        tags: Array.isArray(item.tags) ? item.tags : [],
+        method: (item.method as PaymentMethod) || undefined,
+        receiptStatus: (item.receiptStatus as ReceiptStatus) || "missing",
+        status: (item.status as TransactionStatus) || "pending",
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt || undefined,
+      }));
     } catch {
       return [];
     }
@@ -24,7 +65,17 @@ export class LocalStorageAdapter implements StorageAdapter {
 
   async add(tx: Transaction): Promise<void> {
     const current = await this.getAll();
-    await this.save([tx, ...current]);
+
+    // Ensure new fields have defaults
+    const normalized: Transaction = {
+      ...tx,
+      payee: tx.payee || tx.description || "",
+      method: tx.method || "card",
+      receiptStatus: tx.receiptStatus || "missing",
+      status: tx.status || "pending",
+    };
+
+    await this.save([normalized, ...current]);
   }
 
   async update(id: string, patch: Partial<Transaction>): Promise<void> {
@@ -57,7 +108,17 @@ export class LocalStorageAdapter implements StorageAdapter {
 
   async import(txs: Transaction[]): Promise<void> {
     const current = await this.getAll();
+
+    // Normalize imported transactions
+    const normalized = txs.map((tx) => ({
+      ...tx,
+      payee: tx.payee || tx.description || "",
+      method: tx.method || "card",
+      receiptStatus: tx.receiptStatus || "missing",
+      status: tx.status || "pending",
+    }));
+
     // Prepend new imports
-    await this.save([...txs, ...current]);
+    await this.save([...normalized, ...current]);
   }
 }

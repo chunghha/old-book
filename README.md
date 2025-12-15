@@ -1,29 +1,37 @@
 # Book Keeper (Retro Edition)
 
-A local-first personal finance application built with **TanStack Start**, **React**, and **Tailwind CSS v4**.
+A local-first personal finance application built with **React**, **Tailwind CSS v4**, and **Tauri v2**.
 
 It features a unique "Desktop Environment" theming engine that accurately recreates the look and feel of classic operating systems, rendering the entire application window inside a themed desktop layer.
 
 ## 🎨 Themes
 
 The app includes four pixel-perfect retro themes:
-1.  **CDE (Common Desktop Environment):** Solaris-style teal, serif fonts, and thick beveled panels.
-2.  **BeOS:** Classic yellow tabs, grey UI, and Verdana typography.
-3.  **AIX (Motif):** Industrial grey, sharp edges, and Helvetica fonts.
-4.  **KDE 3 (Plastic):** Early 2000s gradients, soft blue/grey palette, and Tahoma fonts.
+
+1. **CDE (Common Desktop Environment):** Solaris-style teal, serif fonts, and thick beveled panels.
+2. **BeOS:** Classic yellow tabs, grey UI, and Verdana typography.
+3. **AIX (Motif):** Industrial grey, sharp edges, and Helvetica fonts.
+4. **KDE 3 (Plastic):** Early 2000s gradients, soft blue/grey palette, and Tahoma fonts.
 
 ## 🛠️ Tech Stack
 
-*   **Framework:** TanStack Start (Prototype / SPA Mode)
-*   **Styling:** Tailwind CSS v4 (with extensive CSS variable theming)
-*   **State:** Zustand
-*   **Persistence:** `localStorage` (Currently), migrating to **Tauri + SQLite**.
-*   **Icons:** Lucide React
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | React 19, Tailwind CSS v4 |
+| **Forms** | TanStack Form |
+| **State** | Zustand (async actions) |
+| **Desktop** | Tauri v2 (frameless window) |
+| **Database** | SQLite (via `tauri-plugin-sql`) |
+| **Web Fallback** | localStorage |
+| **Icons** | Lucide React |
+| **Linting** | Biome (TS/JS), Clippy (Rust) |
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-*   Bun
+
+- [Bun](https://bun.sh/) (JavaScript runtime & package manager)
+- [Rust](https://rustup.rs/) (for Tauri backend)
 
 ### Installation
 
@@ -31,24 +39,149 @@ The app includes four pixel-perfect retro themes:
 bun install
 ```
 
-### Run Development Server
+### Development
+
 ```bash
+# Web mode (browser only, uses localStorage)
 bun dev
+
+# Desktop mode (Tauri + SQLite)
+bun tauri:dev
 ```
-Open http://localhost:5174 in your browser.
 
+Open http://localhost:5174 in your browser for web mode.
 
-## 🔮 Roadmap: Tauri + SQLite
-The next phase of development involves wrapping this application in Tauri.
+## 📜 Available Scripts
 
-Native Windowing: The CSS-drawn title bars (CDE/BeOS tabs) will become the actual drag handles for the native OS window.
+### Build & Quality
 
-SQLite Database: Moving away from localStorage to a local SQLite file for robust data handling.
-Performance: Using Rust for heavy data processing (importing large CSVs).
+| Script | Description |
+|--------|-------------|
+| `bun run build` | Build frontend for production |
+| `bun run build:all` | Full pipeline: format → lint → clippy → build |
+| `bun run preview` | Preview production build locally |
 
+### Linting & Formatting
+
+| Script | Description |
+|--------|-------------|
+| `bun run format` | Format TypeScript/JavaScript with Biome |
+| `bun run lint` | Lint TypeScript/JavaScript with Biome |
+| `bun run check` | Run all Biome checks |
+| `bun run check:unsafe` | Auto-fix with unsafe transformations |
+
+### Rust (Tauri Backend)
+
+| Script | Description |
+|--------|-------------|
+| `bun run rust:fmt` | Format Rust code with `cargo fmt` |
+| `bun run rust:fmt:check` | Check Rust formatting (CI-friendly) |
+| `bun run rust:clippy` | Run Clippy linter with warnings as errors |
+
+### Tauri
+
+| Script | Description |
+|--------|-------------|
+| `bun run tauri` | Run Tauri CLI commands |
+| `bun run tauri:dev` | Start Tauri development mode |
 
 ## 📂 Project Structure
-app/routes/: Application pages (Transactions, Settings).
-app/themes/: CSS entry points for each desktop environment.
-app/stores/: Zustand state management.
-src/main.tsx: Entry point and manual router configuration.
+
+```
+project/
+├── src-tauri/                 # Rust backend (Tauri)
+│   ├── src/
+│   │   ├── main.rs            # App entry point
+│   │   └── lib.rs             # Plugin registration
+│   ├── capabilities/          # Tauri permissions
+│   └── tauri.conf.json        # Window configuration
+├── app/
+│   ├── db/
+│   │   ├── index.ts           # Database adapter factory
+│   │   ├── types.ts           # Transaction types & interfaces
+│   │   ├── sqlite.ts          # Tauri SQLite implementation
+│   │   └── local.ts           # localStorage fallback
+│   ├── lib/
+│   │   └── window.ts          # Tauri window controls
+│   ├── stores/
+│   │   └── transactions.tsx   # Zustand store (async)
+│   ├── themes/
+│   │   ├── index.tsx          # ThemeProvider & useTheme
+│   │   ├── kde.css
+│   │   ├── aix.css
+│   │   ├── beos.css
+│   │   └── cde.css
+│   └── routes/
+│       ├── __root.tsx         # App shell & window chrome
+│       ├── transactions/      # Transaction management
+│       └── settings/          # Theme & data settings
+├── src/
+│   ├── main.tsx               # SPA router mount
+│   ├── landing.tsx            # Landing page
+│   └── index.css              # Tailwind entry
+└── package.json
+```
+
+## ✨ Features
+
+### Implemented
+
+- [x] Four retro desktop themes (CDE, BeOS, AIX, KDE)
+- [x] Frameless native window with themed title bars
+- [x] Working window controls (minimize, maximize, close)
+- [x] Transaction CRUD with TanStack Form
+- [x] Interactive charts with real data (IN/OUT lines, category breakdown)
+- [x] Daily/Weekly/Monthly time range toggle
+- [x] Filter bar (type, status, date range, category, account, search)
+- [x] Dual storage mode (SQLite in Tauri, localStorage in web)
+- [x] JSON/CSV import and export
+
+### Transaction Fields
+
+| Field | Description |
+|-------|-------------|
+| Date | Transaction date |
+| Type | Credit (income) or Debit (expense) |
+| Payee | To/From party |
+| Amount | Transaction amount |
+| Account | Bank account reference |
+| Category | Expense/income category |
+| Method | Card, Wire, ACH, Transfer, etc. |
+| Receipt | Attached, Missing, N/A |
+| Status | Done, Pending, Review |
+
+## 🗄️ Database Schema
+
+```sql
+CREATE TABLE transactions (
+  id TEXT PRIMARY KEY,
+  date TEXT NOT NULL,
+  amount REAL NOT NULL,
+  type TEXT NOT NULL,
+  payee TEXT,
+  description TEXT,
+  account TEXT,
+  category TEXT,
+  tags TEXT,
+  method TEXT,
+  receipt_status TEXT,
+  status TEXT DEFAULT 'pending',
+  created_at TEXT,
+  updated_at TEXT
+);
+```
+
+## 🔮 Roadmap
+
+- [ ] TanStack Query for data fetching
+- [ ] TanStack Virtual for large transaction lists
+- [ ] Edit transaction modal
+- [ ] Native file dialogs for import/export
+- [ ] TanStack Router for type-safe routing
+- [ ] Multiple account support
+- [ ] Recurring transactions
+- [ ] Budget tracking
+
+## 📄 License
+
+MIT

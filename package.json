@@ -2,16 +2,21 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:all": "bun run format && bun run check && bun run rust:fmt && bun run rust:clippy && bun run build",
     "preview": "vite preview",
     "format": "biome format --write",
     "lint": "biome lint",
     "check": "biome check",
     "check:unsafe": "biome check --write --unsafe",
+    "rust:fmt": "cd src-tauri && cargo fmt",
+    "rust:fmt:check": "cd src-tauri && cargo fmt --check",
+    "rust:clippy": "cd src-tauri && cargo clippy -- -D warnings",
     "tauri": "tauri",
     "tauri:dev": "bun run tauri dev"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
+    "@tanstack/react-form": "^1.27.4",
     "@tanstack/react-query": "^5.90.12",
     "@tanstack/react-router": "^1.141.2",
     "@tauri-apps/api": "^2.9.1",
