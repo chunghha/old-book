@@ -3,9 +3,9 @@
 html,
 body,
 #root {
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
+	height: 100%;
+	margin: 0;
+	overflow: hidden;
 }
 
 /*
@@ -13,12 +13,12 @@ body,
    even if utility classes aren't fully loaded yet.
 */
 .desktop-layer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  /* Default fallback background if theme CSS is delayed */
-  background-color: #2c4558;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
+	/* Default fallback background if theme CSS is delayed */
+	background-color: #2c4558;
 }

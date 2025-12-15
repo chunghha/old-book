@@ -1,7 +1,7 @@
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        // Add this line to register the SQLite plugin
+        // Register the SQL plugin here
         .plugin(tauri_plugin_sql::Builder::default().build())
         .setup(|app| {
             if cfg!(debug_assertions) {

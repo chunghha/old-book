@@ -3,6 +3,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "format": "biome format --write",
+    "lint": "biome lint",
+    "check": "biome check",
+    "check:unsafe": "biome check --write --unsafe",
     "tauri": "tauri",
     "tauri:dev": "bun run tauri dev"
   },
@@ -21,7 +25,10 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.3.8",
     "@tauri-apps/cli": "^2.9.6",
+    "@types/react": "^19.2.7",
+    "@vitejs/plugin-react": "^5.1.2",
     "vite": "^7.2.7"
   }
 }

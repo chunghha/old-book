@@ -43,10 +43,13 @@ function SettingsRoute() {
     if (!file) return;
     const reader = new FileReader();
     setIsImporting(true);
-    reader.onload = () => {
+
+    // FileReader is callback-based, so we wrap the async call inside
+    reader.onload = async () => {
       try {
         const text = String(reader.result ?? "");
-        const res = importJSON(text);
+        // Await the async import from the store
+        const res = await importJSON(text);
         setImportResult(`Imported ${res.added} item(s).`);
       } catch (err) {
         setImportResult(
@@ -64,10 +67,11 @@ function SettingsRoute() {
     e.currentTarget.value = "";
   }
 
-  function handlePasteImport() {
+  async function handlePasteImport() {
     setIsImporting(true);
     try {
-      const res = importJSON(pasteValue);
+      // Await the async import
+      const res = await importJSON(pasteValue);
       setImportResult(`Imported ${res.added} item(s) from pasted JSON.`);
     } catch {
       setImportResult(
@@ -97,9 +101,9 @@ function SettingsRoute() {
     );
   }
 
-  function handleClearAll() {
+  async function handleClearAll() {
     if (!confirm("Clear all transactions? This cannot be undone.")) return;
-    clearAll();
+    await clearAll();
     setImportResult("All transactions cleared.");
   }
 
@@ -190,7 +194,7 @@ function SettingsRoute() {
                   disabled={isImporting || pasteValue.trim() === ""}
                   className="px-3 py-2 rounded bg-cyan-600 hover:bg-cyan-500 text-white"
                 >
-                  Import Pasted JSON
+                  {isImporting ? "Importing..." : "Import Pasted JSON"}
                 </button>
                 <button
                   onClick={() => setPasteValue("")}

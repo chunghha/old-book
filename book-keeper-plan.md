@@ -64,7 +64,8 @@ Initialize Tauri: Add Rust backend to the project.
 Configure Windows: Remove system chrome (frame: false) so our CSS themes handle the title bars and window controls.
 
 Window Dragging: Connect the CSS Title Bars (data-tauri-drag-region) to native window movement.
-Phase 3: Database Migration (SQLite)
+
+### Phase 3: Database Migration (SQLite)
 
 Install Plugin: Add @tauri-apps/plugin-sql.
 

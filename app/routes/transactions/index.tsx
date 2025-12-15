@@ -26,25 +26,29 @@ function download(filename: string, content: string, mime = "text/plain") {
 
 function FilterBar() {
   return (
-    <div className="flex flex-wrap items-center gap-3 mb-6">
+    <div className="flex flex-wrap items-center gap-3 mb-6 shrink-0">
       <div className="flex items-center gap-3">
-        <button className="px-3 py-1.5 text-xs font-bold flex items-center gap-2 min-w-[100px] justify-between">
+        <button className="px-3 py-1.5 text-xs font-bold flex items-center gap-2 min-w-[100px] justify-between bg-slate-200 dark:bg-slate-800 border border-slate-400 dark:border-slate-600 rounded-sm hover:brightness-110 active:brightness-90">
           Data View <span className="text-[9px]">▼</span>
         </button>
-        <button className="px-4 py-1.5 text-xs font-bold">Filter</button>
-        <button className="px-3 py-1.5 text-xs font-bold flex items-center gap-2 min-w-[80px] justify-between">
+        <button className="px-4 py-1.5 text-xs font-bold bg-slate-200 dark:bg-slate-800 border border-slate-400 dark:border-slate-600 rounded-sm hover:brightness-110 active:brightness-90">
+          Filter
+        </button>
+        <button className="px-3 py-1.5 text-xs font-bold flex items-center gap-2 min-w-[80px] justify-between bg-slate-200 dark:bg-slate-800 border border-slate-400 dark:border-slate-600 rounded-sm hover:brightness-110 active:brightness-90">
           Date <span className="text-[9px]">▼</span>
         </button>
-        <button className="px-3 py-1.5 text-xs font-bold flex items-center gap-2 min-w-[100px] justify-between">
+        <button className="px-3 py-1.5 text-xs font-bold flex items-center gap-2 min-w-[100px] justify-between bg-slate-200 dark:bg-slate-800 border border-slate-400 dark:border-slate-600 rounded-sm hover:brightness-110 active:brightness-90">
           Keywords <span className="text-[9px]">▼</span>
         </button>
-        <button className="px-3 py-1.5 text-xs font-bold flex items-center gap-2 min-w-[90px] justify-between">
+        <button className="px-3 py-1.5 text-xs font-bold flex items-center gap-2 min-w-[90px] justify-between bg-slate-200 dark:bg-slate-800 border border-slate-400 dark:border-slate-600 rounded-sm hover:brightness-110 active:brightness-90">
           Amount <span className="text-[9px]">▼</span>
         </button>
       </div>
       <div className="flex-1"></div>
       <div>
-        <button className="px-6 py-1.5 text-xs font-bold">Search</button>
+        <button className="px-6 py-1.5 text-xs font-bold bg-slate-200 dark:bg-slate-800 border border-slate-400 dark:border-slate-600 rounded-sm hover:brightness-110 active:brightness-90">
+          Search
+        </button>
       </div>
     </div>
   );
@@ -63,13 +67,13 @@ function GraphSection() {
             <div className="text-3xl font-bold font-serif">$230.00</div>
           </div>
           <div className="flex">
-            <button className="px-3 py-1 text-xs border border-r-0 first:rounded-l last:rounded-r last:border-r bg-slate-700 hover:bg-slate-600">
+            <button className="px-3 py-1 text-xs border border-r-0 first:rounded-l last:rounded-r last:border-r bg-slate-700 hover:bg-slate-600 border-slate-600">
               Daily
             </button>
-            <button className="px-3 py-1 text-xs border border-r-0 bg-slate-700 hover:bg-slate-600">
+            <button className="px-3 py-1 text-xs border border-r-0 bg-slate-700 hover:bg-slate-600 border-slate-600">
               Weekly
             </button>
-            <button className="px-3 py-1 text-xs border last:rounded-r bg-slate-700 hover:bg-slate-600">
+            <button className="px-3 py-1 text-xs border last:rounded-r bg-slate-700 hover:bg-slate-600 border-slate-600">
               Monthly
             </button>
           </div>
@@ -244,6 +248,7 @@ function GraphSection() {
 function TransactionsRoute() {
   // core data from the global store
   const transactions = useTransactionsStore((s) => s.transactions);
+  const isLoading = useTransactionsStore((s) => s.isLoading);
   const selectedIds = useTransactionsStore((s) => s.selectedIds);
   const addTransaction = useTransactionsStore((s) => s.addTransaction);
   const deleteTransaction = useTransactionsStore((s) => s.deleteTransaction);
@@ -349,12 +354,12 @@ function TransactionsRoute() {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       try {
         const text = String(reader.result ?? "");
         let added = 0;
         try {
-          const res = importJSON(text);
+          const res = await importJSON(text);
           added = res.added || 0;
         } catch {
           // ignore errors
@@ -384,6 +389,16 @@ function TransactionsRoute() {
   }
 
   /* ------------------------------ Render --------------------------------- */
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-lg font-bold opacity-60 animate-pulse">
+          Loading Database...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 h-full flex flex-col">
@@ -426,7 +441,7 @@ function TransactionsRoute() {
         </div>
       </header>
 
-      {/* Filter Toolbar matching screenshot */}
+      {/* Filter Toolbar */}
       <FilterBar />
 
       {/* Graph Section */}
