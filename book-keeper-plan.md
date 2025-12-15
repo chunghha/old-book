@@ -3,8 +3,8 @@
 ## Project Goal
 A local-first personal finance application with retro Desktop Environment themes (KDE, AIX, BeOS, CDE).
 
-**Current Status:** Phase 2 Complete (Tauri Integration with SQLite).
-**Next Phase:** Advanced Features (TanStack Query, Virtualization).
+**Current Status:** Phase 4 In Progress (Advanced Features).
+**Completed:** UI, Themes, Tauri, SQLite, Accounts, Budgets, Recurring Transactions.
 
 ## Architecture
 
@@ -114,13 +114,29 @@ interface StorageAdapter {
 ```
 - [x] Dual Mode: App runs in "Web Mode" (localStorage) vs "App Mode" (SQLite) automatically.
 
-### Phase 4: Advanced Features (🔜 NEXT)
+### Phase 4: Advanced Features (🔄 IN PROGRESS)
 
+- [x] **TanStack Form:** Full form integration for add/edit transactions.
+- [x] **Edit Transaction Modal:** Click pencil icon to edit any transaction inline.
+- [x] **Multiple Account Support:** Checking, savings, credit, investment account types.
+- [x] **Budget Tracking:** Set budgets per category with alerts, rollover, and progress tracking.
+- [x] **Recurring Transactions:** Schedule recurring payments with auto-processing and skip functionality.
 - [ ] **TanStack Query:** Replace manual `useEffect` fetching with `useQuery` for better caching/loading states.
 - [ ] **Virtualization:** Use TanStack Virtual for the transaction table to handle 10,000+ rows.
 - [ ] **File System Access:** Native Import/Export using Tauri FS dialogs.
-- [ ] **Edit Transactions:** UI for editing existing transactions (store action ready).
 - [ ] **TanStack Router:** Replace manual SPA routing with type-safe file-based routing.
+- [ ] **Dashboard Page:** Account summaries, budget progress, upcoming recurring.
+
+## Test Data
+
+Sample data files in `test-data/` for development and testing:
+
+| File | Records | Description |
+|------|---------|-------------|
+| `transactions.json` | 60 | Sample transactions (Jan-Mar 2024) |
+| `accounts.json` | 7 | Checking, savings, credit, investment accounts |
+| `budgets.json` | 15 | Budget categories with spending data |
+| `recurring.json` | 20 | Subscriptions, bills, salary, transfers |
 
 ## Dependencies
 
@@ -132,6 +148,8 @@ interface StorageAdapter {
 - `lucide-react` ^0.561.x
 - `@tauri-apps/api` ^2.9.x
 - `@tauri-apps/plugin-sql` ^2.3.x
+- `@tanstack/react-form` ^1.27.x (form state management)
+- `@tanstack/react-virtual` ^3.x (virtualized lists)
 - `@tanstack/react-query` ^5.x (installed, not yet used)
 - `@tanstack/react-router` ^1.x (installed, not yet used)
 

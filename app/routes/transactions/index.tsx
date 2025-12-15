@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useCallback } from "react";
 import { useForm } from "@tanstack/react-form";
+import { Pencil } from "lucide-react";
 import useTransactionsStore, {
   Transaction,
   TransactionType,
@@ -12,6 +13,7 @@ import useTransactionsStore, {
   formatShortDate,
   formatChartDate,
 } from "../../stores/transactions";
+import { EditTransactionModal } from "../../components/EditTransactionModal";
 
 export default TransactionsRoute;
 
@@ -790,6 +792,7 @@ interface TransactionTableProps {
   onClearSelection: () => void;
   onDelete: (id: string) => void;
   onBulkDelete: () => void;
+  onEdit: (tx: Transaction) => void;
 }
 
 function TransactionTable({
@@ -800,6 +803,7 @@ function TransactionTable({
   onClearSelection,
   onDelete,
   onBulkDelete,
+  onEdit,
 }: TransactionTableProps) {
   const allSelected =
     transactions.length > 0 &&
@@ -877,6 +881,9 @@ function TransactionTable({
             <th className="px-3 py-2.5 border-b border-slate-600 w-20">
               Status
             </th>
+            <th className="px-3 py-2.5 border-b border-slate-600 w-16">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -922,11 +929,20 @@ function TransactionTable({
                   ? t.status.charAt(0).toUpperCase() + t.status.slice(1)
                   : "Pending"}
               </td>
+              <td className="px-3 py-2">
+                <button
+                  onClick={() => onEdit(t)}
+                  className="p-1 rounded hover:bg-slate-700 transition-colors"
+                  title="Edit transaction"
+                >
+                  <Pencil size={14} />
+                </button>
+              </td>
             </tr>
           ))}
           {transactions.length === 0 && (
             <tr>
-              <td colSpan={10} className="px-3 py-8 text-center opacity-60">
+              <td colSpan={11} className="px-3 py-8 text-center opacity-60">
                 No transactions found. Add one using the form!
               </td>
             </tr>
@@ -947,8 +963,13 @@ function TransactionsRoute() {
   const filters = useTransactionsStore((s) => s.filters);
   const timeRange = useTransactionsStore((s) => s.timeRange);
 
+  // Local state for edit modal
+  const [editingTransaction, setEditingTransaction] =
+    useState<Transaction | null>(null);
+
   // Store actions
   const addTransaction = useTransactionsStore((s) => s.addTransaction);
+  const updateTransaction = useTransactionsStore((s) => s.updateTransaction);
   const deleteTransaction = useTransactionsStore((s) => s.deleteTransaction);
   const bulkDelete = useTransactionsStore((s) => s.bulkDelete);
   const toggleSelect = useTransactionsStore((s) => s.toggleSelect);
@@ -1003,6 +1024,17 @@ function TransactionsRoute() {
       }
     },
     [deleteTransaction],
+  );
+
+  const handleEdit = useCallback((tx: Transaction) => {
+    setEditingTransaction(tx);
+  }, []);
+
+  const handleSaveEdit = useCallback(
+    async (id: string, data: Partial<Transaction>) => {
+      await updateTransaction(id, data);
+    },
+    [updateTransaction],
   );
 
   const handleBulkDelete = useCallback(() => {
@@ -1163,9 +1195,20 @@ function TransactionsRoute() {
             onClearSelection={clearSelection}
             onDelete={handleDelete}
             onBulkDelete={handleBulkDelete}
+            onEdit={handleEdit}
           />
         </div>
       </div>
+
+      {/* Edit Transaction Modal */}
+      <EditTransactionModal
+        transaction={editingTransaction}
+        isOpen={editingTransaction !== null}
+        onClose={() => setEditingTransaction(null)}
+        onSave={handleSaveEdit}
+        accounts={accounts}
+        categories={categories}
+      />
     </div>
   );
 }

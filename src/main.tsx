@@ -14,6 +14,8 @@ import './index.css' // <--- CRITICAL: Loads Tailwind and base styles
 import Root from '../app/routes/__root'
 import SettingsRoute from '../app/routes/settings'
 import TransactionsRoute from '../app/routes/transactions'
+// Initialize stores
+import { initializeFinanceStore } from '../app/stores/finance'
 import Landing from './landing'
 
 /* Map pathname -> component */
@@ -90,3 +92,8 @@ window.addEventListener('popstate', mount)
 
 /* Initial mount */
 mount()
+
+/* Initialize finance store (accounts, budgets, recurring) */
+initializeFinanceStore().catch((err) => {
+	console.error('Failed to initialize finance store:', err)
+})

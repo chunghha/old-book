@@ -130,11 +130,15 @@ project/
 - [x] Frameless native window with themed title bars
 - [x] Working window controls (minimize, maximize, close)
 - [x] Transaction CRUD with TanStack Form
+- [x] **Edit Transaction Modal** - Click pencil icon to edit any transaction
 - [x] Interactive charts with real data (IN/OUT lines, category breakdown)
 - [x] Daily/Weekly/Monthly time range toggle
 - [x] Filter bar (type, status, date range, category, account, search)
 - [x] Dual storage mode (SQLite in Tauri, localStorage in web)
 - [x] JSON/CSV import and export
+- [x] **Multiple Account Support** - Checking, savings, credit, investment accounts
+- [x] **Budget Tracking** - Set budgets per category with alerts and rollover
+- [x] **Recurring Transactions** - Schedule recurring payments with auto-processing
 
 ### Transaction Fields
 
@@ -171,16 +175,37 @@ CREATE TABLE transactions (
 );
 ```
 
+## 🧪 Test Data
+
+Sample data files are provided in `test-data/` for testing:
+
+| File | Description |
+|------|-------------|
+| `transactions.json` | 60 sample transactions (Jan-Mar 2024) |
+| `accounts.json` | 7 sample accounts (checking, savings, credit, investment) |
+| `budgets.json` | 15 budget categories with spending data |
+| `recurring.json` | 20 recurring transactions (subscriptions, bills, salary) |
+
+Import via Settings page or directly in the browser console.
+
 ## 🔮 Roadmap
 
 - [ ] TanStack Query for data fetching
-- [ ] TanStack Virtual for large transaction lists
-- [ ] Edit transaction modal
-- [ ] Native file dialogs for import/export
+- [ ] TanStack Virtual for large transaction lists (10k+ rows)
+- [ ] Native file dialogs for import/export (Tauri FS)
 - [ ] TanStack Router for type-safe routing
-- [ ] Multiple account support
-- [ ] Recurring transactions
-- [ ] Budget tracking
+- [ ] Dashboard with account summaries
+- [ ] Budget progress visualization
+- [ ] Recurring transaction automation
+- [ ] Reports and analytics page
+
+## 📦 New Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| `@tanstack/react-form` | Form state management |
+| `@tanstack/react-virtual` | Virtualized lists (installed) |
+| `@tanstack/react-query` | Data fetching (installed, not yet used) |
 
 ## 📄 License
 

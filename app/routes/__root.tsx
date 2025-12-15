@@ -97,9 +97,7 @@ function CDEWindow({ children }: { children: React.ReactNode }) {
             <Minus size={10} strokeWidth={4} />
           </button>
         </div>
-        <div className="window-title pointer-events-none">
-          Acme Inc - Book Keeper
-        </div>
+        <div className="window-title pointer-events-none">Book Keeper</div>
         <div className="window-controls">
           <button
             type="button"
@@ -136,9 +134,7 @@ function BeOSWindow({ children }: { children: React.ReactNode }) {
           onClick={closeWindow}
           title="Close"
         />
-        <div className="window-title pointer-events-none">
-          Acme Inc : Book Keeper
-        </div>
+        <div className="window-title pointer-events-none">Book Keeper</div>
         <div className="flex gap-1">
           <button
             type="button"
@@ -188,9 +184,7 @@ function AIXWindow({ children }: { children: React.ReactNode }) {
         >
           <div className="icon-menu" />
         </button>
-        <div className="title-text flex-1 pointer-events-none">
-          acme_inc : book_keeper
-        </div>
+        <div className="title-text flex-1 pointer-events-none">book_keeper</div>
         <div className="flex gap-[2px] mr-[2px]">
           <button
             type="button"
@@ -223,7 +217,7 @@ function KDEWindow({ children }: { children: React.ReactNode }) {
       <div className="title-bar select-none shrink-0" data-tauri-drag-region>
         <div className="flex items-center gap-2 pointer-events-none">
           <div className="window-icon" />
-          <div className="window-title">Acme Inc - Book Keeper</div>
+          <div className="window-title">Book Keeper</div>
         </div>
         <div className="window-controls">
           <button type="button" className="win-btn" title="Help">
